@@ -65,6 +65,8 @@ try:
                     f"Funding: {paper.get('funding', '')}",
                     f"Twitter: {paper.get('twitter', '')}",
                     f"Website: {paper.get('website', '')}",
+                    f"Active Years: {paper.get('active_years', '')}",
+                    f"Top AI Agent in Years: {', '.join(str(y) for y in paper.get('top_in_year', []))}",
                     f"Latest Blog: {paper.get('latest_blog', {}).get('title', '')} ({paper.get('latest_blog', {}).get('url', '')})",
                 ]
                 # Add products
@@ -76,11 +78,30 @@ try:
                 if notable_projects:
                     fields.append(f"Notable Projects: {', '.join(notable_projects)}")
                 # Add resources (news, research, etc.)
-                resources = paper.get('resources', [])
+                resources = paper.get('resources', [])[:200]
                 if resources:
                     fields.append("Resources:")
                     for res in resources:
-                        fields.append(f"- {res.get('title', '')} ({res.get('url', '')})")
+                        res_title = res.get('title', '')
+                        res_url = res.get('url', '')
+                        res_summary = res.get('summary', '') if 'summary' in res else ''
+                        # Add a detailed, dedicated Document for each resource
+                        resource_content = f"Resource Title: {res_title}\nResource URL: {res_url}\nParent: {paper.get('name', '')}\nCategory: {paper.get('category', '')}"
+                        if res_summary:
+                            resource_content += f"\nSummary: {res_summary}"
+                        resource_metadata = {
+                            "source": source_name,
+                            "title": res_title,
+                            "url": res_url,
+                            "parent": paper.get('name', ''),
+                            "category": paper.get('category', '')
+                        }
+                        all_docs.append(Document(page_content=resource_content, metadata=resource_metadata))
+                        # Also include in the parent chunk
+                        if res_summary:
+                            fields.append(f"- {res_title} ({res_url})\n  Summary: {res_summary}")
+                        else:
+                            fields.append(f"- {res_title} ({res_url})")
                 content = "\n".join([f for f in fields if f and f != '()'])
             else:
                 content = f"Title: {title}\n\nSummary: {summary}"
@@ -93,15 +114,16 @@ try:
 
             doc = Document(page_content=content, metadata=metadata)
             all_docs.append(doc)
+
     logging.info(f"Created {len(all_docs)} documents.")
 
     logging.info("Splitting documents...")
-    splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100)
+    splitter = RecursiveCharacterTextSplitter(chunk_size=2500, chunk_overlap=300)
     texts = splitter.split_documents(all_docs)
     logging.info(f"Split into {len(texts)} chunks.")
 
     # Define the path for the FAISS index
-    faiss_index_path = "faiss_index/research_index"
+    faiss_index_path = "faiss_index"
 
     # Check if index already exists to avoid re-indexing every time
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
@@ -207,10 +229,11 @@ def retrieve_context(query: str, vectorstore: FAISS, k: int = 12, diversify_sour
             text_lower = text.lower()
             return any(kw in text_lower for kw in keywords)
         filtered_docs = [doc for doc in docs_final if is_ai_related(doc.page_content) or is_ai_related(doc.metadata.get('title', ''))]
-        # If not enough, fall back to original
+        # Loosen filtering: if at least 1, use, else fallback to top k most relevant
         if len(filtered_docs) >= 1:
             docs_to_use = filtered_docs[:k]
         else:
+            # Fallback: always provide top k most relevant context
             docs_to_use = docs_final[:k]
         # TODO: Integrate more sources (OpenAI blog, AI news, etc) in data_loader.py and indexing.
 

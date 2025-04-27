@@ -67,18 +67,75 @@ def github_star_button(user, repo):
 github_star_button("Chirag-S-Kotian", "BARTOZ-AI")
 
 st.markdown("""
-<h1 style='text-align:center; font-size:2.6rem;letter-spacing:2px;margin-bottom:0.2em;'>BARTOZ-AI</h1>
-<p style='text-align:center; font-size:1.25rem; color:#555; margin-top:0;'>
-  <b>Open Source AI/ML/LLM Research Assistant</b><br>
-  <span style='font-size:1.05rem;'>by <a href='https://github.com/Chirag-S-Kotian' target='_blank'>Chirag S Kotian</a></span>
-</p>
-<p style='text-align:center; font-size:1.05rem;'>
-  Your expert assistant for all things <b>AI, ML, LLMs, AI agents, and companies</b>.<br>
-  Powered by Retrieval-Augmented Generation (RAG), Gemini, DeepSeek, and open data sources.
-</p>
+<style>
+body {
+    background: linear-gradient(120deg, #e0e7ff 0%, #f0f8ff 100%);
+}
+.bartoz-title {
+    text-align: center;
+    font-size: 2.8rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 0.2em;
+    background: linear-gradient(90deg, #6366f1 10%, #3b82f6 90%);
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+.bartoz-desc {
+    text-align: center;
+    font-size: 1.3rem;
+    color: #333;
+    margin-top: 0.1em;
+    margin-bottom: 0.5em;
+}
+.bartoz-author {
+    text-align: center;
+    font-size: 1.08rem;
+    color: #555;
+    margin-bottom: 0.6em;
+}
+.sample-queries {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 1.2em 0 1.7em 0;
+    gap: 0.7em;
+}
+.sample-query-btn {
+    background: linear-gradient(90deg,#6366f1 0%,#60a5fa 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.05rem;
+    padding: 0.5em 1.2em;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.sample-query-btn:hover {
+    background: linear-gradient(90deg,#818cf8 0%,#38bdf8 100%);
+}
+@media (max-width: 600px) {
+    .bartoz-title {font-size:2rem;}
+    .bartoz-desc {font-size:1.08rem;}
+    .bartoz-author {font-size:1rem;}
+}
+</style>
+<div class='bartoz-title'>BARTOZ-AI <img src="https://img.icons8.com/ios-filled/50/6366f1/artificial-intelligence.png" width="40" style="vertical-align:middle;margin-left:10px;"/></div>
+<div class='bartoz-desc'>Open Source AI/ML/LLM Research Assistant</div>
+<div class='bartoz-author'>by <a href='https://github.com/Chirag-S-Kotian' target='_blank'>Chirag S Kotian</a></div>
+<div style='display:flex;justify-content:center;margin:2em 0 1.2em 0;'>
+    <input id='main-search' style='width:330px;max-width:95vw;padding:13px 18px;font-size:1.15rem;border-radius:10px;border:1.5px solid #c7d2fe;box-shadow:0 2px 8px #e0e7ff;' placeholder='Ask anything about AI, agents, LLMs...' autofocus />
+    <button onclick="document.getElementById('main-search').focus();" style='margin-left:10px;background:linear-gradient(90deg,#6366f1 0%,#60a5fa 100%);color:#fff;border:none;border-radius:10px;padding:13px 22px;font-size:1.15rem;cursor:pointer;box-shadow:0 2px 8px #e0e7ff;'>🔍</button>
+</div>
+<div class='sample-queries'>
+    <button class='sample-query-btn' onclick="window.parent.postMessage('sample_query:Who are the top AI agents in 2025?', '*');">🎲 Who are the top AI agents in 2025?</button>
+    <button class='sample-query-btn' onclick="window.parent.postMessage('sample_query:What is the latest research from OpenAI?', '*');">🎲 What is the latest research from OpenAI?</button>
+    <button class='sample-query-btn' onclick="window.parent.postMessage('sample_query:Compare Anthropic and Google DeepMind.', '*');">🎲 Compare Anthropic and Google DeepMind.</button>
+</div>
+<hr style='margin-top:2em;margin-bottom:1.5em;'>
 """, unsafe_allow_html=True)
 
-st.markdown("<hr>", unsafe_allow_html=True)
 
 # --- Sample Query Button ---
 sample_queries = [

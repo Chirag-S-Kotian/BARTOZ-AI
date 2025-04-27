@@ -22,7 +22,9 @@ def fetch_ai_companies():
             "website": "https://github.com/Significant-Gravitas/Auto-GPT",
             "category": "agent",
             "source": "ai_agent",
-            "rss": "https://github.com/Significant-Gravitas/Auto-GPT/releases.atom"
+            "rss": "https://github.com/Significant-Gravitas/Auto-GPT/releases.atom",
+            "active_years": "2023-2025",
+            "top_in_year": [2023, 2024, 2025]
         },
         {
             "name": "BabyAGI",
@@ -33,7 +35,9 @@ def fetch_ai_companies():
             "website": "https://github.com/yoheinakajima/babyagi",
             "category": "agent",
             "source": "ai_agent",
-            "rss": "https://github.com/yoheinakajima/babyagi/releases.atom"
+            "rss": "https://github.com/yoheinakajima/babyagi/releases.atom",
+            "active_years": "2023-2025",
+            "top_in_year": [2024, 2025]
         },
         {
             "name": "AgentGPT",
@@ -44,7 +48,9 @@ def fetch_ai_companies():
             "website": "https://agentgpt.reworkd.ai/",
             "category": "agent",
             "source": "ai_agent",
-            "rss": ""
+            "rss": "",
+            "active_years": "2023-2025",
+            "top_in_year": [2025]
         },
         {
             "name": "LangChain Agents",
@@ -55,7 +61,9 @@ def fetch_ai_companies():
             "website": "https://python.langchain.com/docs/modules/agents",
             "category": "agent",
             "source": "ai_agent",
-            "rss": "https://langchain.com/blog/rss.xml"
+            "rss": "https://langchain.com/blog/rss.xml",
+            "active_years": "2022-2025",
+            "top_in_year": [2023, 2024, 2025]
         },
         {
             "name": "CrewAI",
@@ -66,7 +74,9 @@ def fetch_ai_companies():
             "website": "https://crewai.com/",
             "category": "agent",
             "source": "ai_agent",
-            "rss": "https://github.com/joaomdmoura/crewAI/releases.atom"
+            "rss": "https://github.com/joaomdmoura/crewAI/releases.atom",
+            "active_years": "2024-2025",
+            "top_in_year": [2025]
         },
         # --- Major Companies ---
         {
@@ -317,7 +327,7 @@ def fetch_ssrn(keyword="AI"):
         })
     return papers
 
-def fetch_openai_blog(max_results=10):
+def fetch_openai_blog(max_results=200):
     """Fetch latest posts from OpenAI blog RSS feed."""
     feed_url = "https://openai.com/blog/rss.xml"
     feed = feedparser.parse(feed_url)
@@ -332,7 +342,7 @@ def fetch_openai_blog(max_results=10):
         })
     return posts
 
-def fetch_the_batch_newsletter(max_results=10):
+def fetch_the_batch_newsletter(max_results=200):
     """Fetch latest posts from The Batch (deeplearning.ai) newsletter RSS feed."""
     feed_url = "https://www.deeplearning.ai/the-batch/feed/rss/"
     feed = feedparser.parse(feed_url)

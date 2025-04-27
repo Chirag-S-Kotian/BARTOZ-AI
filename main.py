@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from rag_pipeline import get_research_answer
+from rag_pipeline import get_research_answer, vectorstore
 from openrouter_client import openrouter_query
 from gemini_client import gemini_query
 
