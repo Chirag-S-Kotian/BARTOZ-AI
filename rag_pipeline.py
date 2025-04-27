@@ -1,7 +1,7 @@
 # Assuming necessary imports for your RAG pipeline components
 # Ensure these libraries are installed:
 # pip install langchain-community faiss-cpu sentence-transformers
-from data_loader import fetch_arxiv, fetch_pubmed, fetch_ssrn # Assuming this file exists and works and its functions are synchronous
+from data_loader import fetch_arxiv, fetch_pubmed, fetch_ssrn, fetch_ai_companies # Import fetch_ai_companies for company/agent info
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -37,7 +37,8 @@ try:
     sources = {
         "arxiv": fetch_arxiv(), # Assuming fetch_arxiv returns data synchronously with metadata
         "pubmed": fetch_pubmed(), # Assuming fetch_pubmed returns data synchronously with metadata
-        "ssrn": fetch_ssrn() # Assuming fetch_ssrn returns data synchronously with metadata
+        "ssrn": fetch_ssrn(), # Assuming fetch_ssrn returns data synchronously with metadata
+        "ai_companies": fetch_ai_companies() # New: company/LLM/agent info
     }
     logging.info("Data fetching complete.")
 
@@ -197,16 +198,23 @@ def retrieve_context(query: str, vectorstore: FAISS, k: int = 12, diversify_sour
                 context_parts.append(f"Published: {published_date}\n")
             context_parts.append(f"Content: {content}\n")
         context = "\n".join(context_parts)
-        formatted_context_prompt = f"""You are an expert AI research assistant. Only answer questions strictly about AI, AI agents, or AI companies. If the question or context is not about these, reply: 'Sorry, I can only answer questions about AI, AI agents, or AI companies.'
+        formatted_context_prompt = f"""
+You are an expert AI/ML/LLM research assistant.
+STRICT INSTRUCTIONS:
+- ONLY answer using the information provided in the context below.
+- If the answer is not found in the context, reply: 'Sorry, the answer was not found in the provided research context.'
+- Do NOT use prior knowledge or make up answers.
+- Always cite the source title and URL for any fact.
 
-Using the following up-to-date research context, answer the user's question as briefly and accurately as possible. Cite the source titles and provide URLs for the information you use. If the context does not contain relevant information to answer the question, state that you cannot answer based on the provided context.
-
-Research Context:
+---
+[RESEARCH CONTEXT]
 {context}
-
-User Question: {query}
-
-Brief Answer:"""
+---
+[USER QUESTION]
+{query}
+---
+Provide a brief, accurate answer using only the context above. If not found, say so.
+"""
         return formatted_context_prompt
     except Exception as e:
         logging.error(f"Error during context retrieval: {e}", exc_info=True)

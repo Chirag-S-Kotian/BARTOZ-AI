@@ -8,6 +8,12 @@ st.set_page_config(page_title="AI Research Assistant", page_icon="🧠", layout=
 # Sidebar: About, Tips, Features, Open Source
 with st.sidebar:
     st.image("https://img.icons8.com/ios-filled/100/000000/artificial-intelligence.png", width=60)
+    # --- RAG DB Size ---
+    try:
+        db_size = requests.get("http://localhost:8000/db_size", timeout=2).json().get("size", "-")
+        st.markdown(f"**📦 RAG DB Size:** {db_size} chunks")
+    except Exception:
+        st.markdown("**📦 RAG DB Size:** - (unavailable)")
     st.markdown("""
     # 🤖 About
     **BARTOZ-AI: Open Source AI Research Assistant**

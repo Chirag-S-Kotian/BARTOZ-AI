@@ -12,6 +12,58 @@ def fetch_ai_companies():
     """
     # Example static data; in production, you can scrape or use APIs for live updates
     companies = [
+        # --- AI Agent Projects/Frameworks ---
+        {
+            "name": "Auto-GPT",
+            "description": "Auto-GPT is an experimental open-source application demonstrating the capabilities of the GPT-4 language model to autonomously achieve goals.",
+            "founded": 2023,
+            "founders": ["Significant Gravitas (Toran Bruce Richards)"],
+            "headquarters": "Remote/Open Source",
+            "website": "https://github.com/Significant-Gravitas/Auto-GPT",
+            "source": "ai_agent",
+            "rss": "https://github.com/Significant-Gravitas/Auto-GPT/releases.atom"
+        },
+        {
+            "name": "BabyAGI",
+            "description": "BabyAGI is a simple AI-powered task management system inspired by the concept of an AI agent that can create, prioritize, and execute tasks.",
+            "founded": 2023,
+            "founders": ["Yohei Nakajima"],
+            "headquarters": "Remote/Open Source",
+            "website": "https://github.com/yoheinakajima/babyagi",
+            "source": "ai_agent",
+            "rss": "https://github.com/yoheinakajima/babyagi/releases.atom"
+        },
+        {
+            "name": "AgentGPT",
+            "description": "AgentGPT allows you to configure and deploy autonomous AI agents in your browser.",
+            "founded": 2023,
+            "founders": ["Reworkd"],
+            "headquarters": "Remote/Open Source",
+            "website": "https://agentgpt.reworkd.ai/",
+            "source": "ai_agent",
+            "rss": ""
+        },
+        {
+            "name": "LangChain Agents",
+            "description": "LangChain Agents enable LLMs to make decisions and take actions autonomously, integrating with tools and APIs.",
+            "founded": 2022,
+            "founders": ["Harrison Chase"],
+            "headquarters": "Remote/Open Source",
+            "website": "https://python.langchain.com/docs/modules/agents",
+            "source": "ai_agent",
+            "rss": "https://langchain.com/blog/rss.xml"
+        },
+        {
+            "name": "CrewAI",
+            "description": "CrewAI is a framework for orchestrating collaborative multi-agent LLM systems to solve complex tasks.",
+            "founded": 2024,
+            "founders": ["CrewAI Community"],
+            "headquarters": "Remote/Open Source",
+            "website": "https://crewai.com/",
+            "source": "ai_agent",
+            "rss": "https://github.com/joaomdmoura/crewAI/releases.atom"
+        },
+        # --- Major Companies ---
         {
             "name": "OpenAI",
             "description": "OpenAI is an AI research and deployment company, creator of GPT-3, GPT-4, ChatGPT, and DALL·E.",
@@ -20,7 +72,14 @@ def fetch_ai_companies():
             "headquarters": "San Francisco, CA, USA",
             "website": "https://openai.com",
             "source": "openai_company",
-            "rss": "https://openai.com/blog/rss.xml"
+            "rss": "https://openai.com/blog/rss.xml",
+            "products": ["GPT-3", "GPT-4", "ChatGPT", "DALL·E 2", "DALL·E 3", "Whisper"],
+            "ceo": "Sam Altman",
+            "notable_projects": ["ChatGPT", "DALL·E", "Codex", "OpenAI Gym"],
+            "valuation": "$80-90B (2023)",
+            "funding": "$11.3B+",
+            "twitter": "https://twitter.com/openai",
+            "latest_blog": (fetch_openai_blog(1)[0] if 'fetch_openai_blog' in globals() else {"title": "See OpenAI blog", "url": "https://openai.com/blog"})
         },
         {
             "name": "DeepMind",
@@ -30,7 +89,14 @@ def fetch_ai_companies():
             "headquarters": "London, UK",
             "website": "https://deepmind.com",
             "source": "deepmind_company",
-            "rss": "https://deepmind.com/blog/feed/basic/"
+            "rss": "https://deepmind.com/blog/feed/basic/",
+            "products": ["AlphaGo", "AlphaFold", "AlphaStar", "Gato", "Gemini (with Google)"],
+            "ceo": "Demis Hassabis",
+            "notable_projects": ["AlphaGo", "AlphaFold", "WaveNet", "Gemini"],
+            "valuation": "Acquired by Google for ~$500M (2014)",
+            "funding": "Acquired by Google",
+            "twitter": "https://twitter.com/DeepMind",
+            "latest_blog": {"title": "See DeepMind blog", "url": "https://deepmind.com/blog"}
         },
         {
             "name": "Anthropic",
@@ -40,7 +106,14 @@ def fetch_ai_companies():
             "headquarters": "San Francisco, CA, USA",
             "website": "https://www.anthropic.com",
             "source": "anthropic_company",
-            "rss": "https://www.anthropic.com/news/rss.xml"
+            "rss": "https://www.anthropic.com/news/rss.xml",
+            "products": ["Claude 2", "Claude 3"],
+            "ceo": "Dario Amodei",
+            "notable_projects": ["Claude"],
+            "valuation": "$18B (2024)",
+            "funding": "$7.3B+",
+            "twitter": "https://twitter.com/AnthropicAI",
+            "latest_blog": {"title": "See Anthropic news", "url": "https://www.anthropic.com/news"}
         },
         {
             "name": "Cohere",
@@ -50,7 +123,14 @@ def fetch_ai_companies():
             "headquarters": "Toronto, Canada",
             "website": "https://cohere.com",
             "source": "cohere_company",
-            "rss": "https://txt.cohere.com/rss/"
+            "rss": "https://txt.cohere.com/rss/",
+            "products": ["Command R", "Embed", "Generate"],
+            "ceo": "Aidan Gomez",
+            "notable_projects": ["Command R", "Multilingual Embeddings"],
+            "valuation": "$2.2B (2023)",
+            "funding": "$445M+",
+            "twitter": "https://twitter.com/cohere",
+            "latest_blog": {"title": "See Cohere blog", "url": "https://txt.cohere.com/"}
         },
         {
             "name": "Hugging Face",
@@ -60,7 +140,14 @@ def fetch_ai_companies():
             "headquarters": "New York, NY, USA",
             "website": "https://huggingface.co",
             "source": "huggingface_company",
-            "rss": "https://huggingface.co/blog/feed.xml"
+            "rss": "https://huggingface.co/blog/feed.xml",
+            "products": ["Transformers", "Diffusers", "Datasets", "Spaces"],
+            "ceo": "Clément Delangue",
+            "notable_projects": ["Transformers Library", "Model Hub", "Spaces"],
+            "valuation": "$4.5B (2023)",
+            "funding": "$395M+",
+            "twitter": "https://twitter.com/huggingface",
+            "latest_blog": {"title": "See Hugging Face blog", "url": "https://huggingface.co/blog"}
         },
         {
             "name": "Stability AI",
@@ -70,7 +157,14 @@ def fetch_ai_companies():
             "headquarters": "London, UK",
             "website": "https://stability.ai",
             "source": "stabilityai_company",
-            "rss": "https://stability.ai/blog/rss.xml"
+            "rss": "https://stability.ai/blog/rss.xml",
+            "products": ["Stable Diffusion", "StableLM", "Stable Audio"],
+            "ceo": "Emad Mostaque (as of 2023)",
+            "notable_projects": ["Stable Diffusion", "StableLM"],
+            "valuation": "$1B+ (2023)",
+            "funding": "$125M+",
+            "twitter": "https://twitter.com/StabilityAI",
+            "latest_blog": {"title": "See Stability AI blog", "url": "https://stability.ai/blog"}
         },
         {
             "name": "Google Research",
@@ -80,7 +174,14 @@ def fetch_ai_companies():
             "headquarters": "Mountain View, CA, USA",
             "website": "https://research.google",
             "source": "google_company",
-            "rss": "https://blog.research.google/atom.xml"
+            "rss": "https://blog.research.google/atom.xml",
+            "products": ["BERT", "PaLM", "Gemini", "Imagen"],
+            "ceo": "Sundar Pichai (Alphabet)",
+            "notable_projects": ["BERT", "PaLM", "Gemini"],
+            "valuation": "Part of Alphabet ($1.7T+)",
+            "funding": "Public company",
+            "twitter": "https://twitter.com/GoogleAI",
+            "latest_blog": {"title": "See Google Research blog", "url": "https://blog.research.google/"}
         },
         {
             "name": "Microsoft Research",
@@ -90,9 +191,17 @@ def fetch_ai_companies():
             "headquarters": "Redmond, WA, USA",
             "website": "https://www.microsoft.com/en-us/research/",
             "source": "microsoft_company",
-            "rss": "https://www.microsoft.com/en-us/research/feed/"
+            "rss": "https://www.microsoft.com/en-us/research/feed/",
+            "products": ["Azure AI", "Copilot", "Turing-NLG"],
+            "ceo": "Satya Nadella (Microsoft)",
+            "notable_projects": ["OpenAI Partnership", "Azure AI", "Copilot"],
+            "valuation": "$2.8T+ (Microsoft, 2024)",
+            "funding": "Public company",
+            "twitter": "https://twitter.com/msftresearch",
+            "latest_blog": {"title": "See Microsoft Research blog", "url": "https://www.microsoft.com/en-us/research/blog/"}
         }
     ]
+
     # Optionally, fetch and enrich with latest blog/news headlines
     enriched = []
     for comp in companies:

@@ -7,6 +7,17 @@ from gemini_client import gemini_query
 
 app = FastAPI()
 
+# --- DB Size Endpoint ---
+@app.get("/db_size")
+def db_size():
+    try:
+        if 'vectorstore' in globals() and vectorstore is not None:
+            return {"size": len(vectorstore.docstore._dict)}
+        else:
+            return {"size": 0}
+    except Exception:
+        return {"size": 0}
+
 # Allow frontend to talk to backend
 app.add_middleware(
     CORSMiddleware,

@@ -6,6 +6,43 @@
 
 ---
 
+## 🚦 Installation & Getting Started
+
+1. **Clone the repo:**
+   ```bash
+   git clone https://github.com/Chirag-S-Kotian/BARTOZ-AI.git
+   cd BARTOZ-AI
+   ```
+2. **Create & activate a virtual environment:**
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+3. **Install Python dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. **Set up your API keys:**
+   - Create a `.env` file in the project root with:
+     ```
+     OPENROUTER_API_KEY=your-openrouter-key
+     GEMINI_API_KEY=your-gemini-key
+     ```
+5. **Run the data ingestion/indexing pipeline:**
+   ```bash
+   python rag_pipeline.py
+   ```
+6. **Start the backend server:**
+   ```bash
+   uvicorn main:app --reload --port 8000
+   ```
+7. **Start the frontend (Streamlit):**
+   ```bash
+   streamlit run frontend/app.py
+   ```
+
+---
+
 > **by [Chirag S Kotian](https://github.com/Chirag-S-Kotian)**
 
 ---
