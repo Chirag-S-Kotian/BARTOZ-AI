@@ -1,0 +1,48 @@
+# Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+ENV/
+env/
+.venv/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE/editor settings
+.vscode/
+.idea/
+*.swp
+
+# Environment variables and secrets
+.env
+.env.*
+
+# FAISS index and embeddings (large/binary data)
+faiss_index/
+*.faiss
+*.pkl
+*.npy
+
+# Logs and runtime files
+*.log
+*.sqlite3
+
+# Jupyter notebooks checkpoints (if any)
+.ipynb_checkpoints/
+
+# Streamlit cache
+.streamlit/
+
+# Scheduler logs (if you add them)
+scheduler.log
+
+# Miscellaneous
+*.bak
+*.tmp
+nv

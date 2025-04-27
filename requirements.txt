@@ -1,0 +1,13 @@
+langchain
+faiss-cpu
+transformers
+sentence-transformers
+beautifulsoup4
+requests
+tqdm
+openai
+google-generativeai
+python-dotenv
+lxmlfastapi
+uvicorn
+feedparser
