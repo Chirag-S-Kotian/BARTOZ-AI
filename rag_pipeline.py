@@ -48,15 +48,48 @@ try:
             # Ensure paper has 'title', 'summary', and ideally 'published_date', 'url' keys
             title = paper.get('title', 'No Title')
             summary = paper.get('summary', 'No Summary')
-            published_date = paper.get('published_date') # Get date metadata if available
-            url = paper.get('url') # Get URL metadata if available
+            published_date = paper.get('published_date')
+            url = paper.get('url')
 
-            content = f"Title: {title}\n\nSummary: {summary}"
+            if source_name == 'ai_companies':
+                # For companies, include all enriched fields and lists
+                fields = [
+                    f"Name: {paper.get('name', '')}",
+                    f"Category: {paper.get('category', '')}",
+                    f"Description: {paper.get('description', '')}",
+                    f"Founded: {paper.get('founded', '')}",
+                    f"Founders: {', '.join(paper.get('founders', []))}",
+                    f"Headquarters: {paper.get('headquarters', '')}",
+                    f"CEO: {paper.get('ceo', '')}",
+                    f"Valuation: {paper.get('valuation', '')}",
+                    f"Funding: {paper.get('funding', '')}",
+                    f"Twitter: {paper.get('twitter', '')}",
+                    f"Website: {paper.get('website', '')}",
+                    f"Latest Blog: {paper.get('latest_blog', {}).get('title', '')} ({paper.get('latest_blog', {}).get('url', '')})",
+                ]
+                # Add products
+                products = paper.get('products', [])
+                if products:
+                    fields.append(f"Products: {', '.join(products)}")
+                # Add notable projects
+                notable_projects = paper.get('notable_projects', [])
+                if notable_projects:
+                    fields.append(f"Notable Projects: {', '.join(notable_projects)}")
+                # Add resources (news, research, etc.)
+                resources = paper.get('resources', [])
+                if resources:
+                    fields.append("Resources:")
+                    for res in resources:
+                        fields.append(f"- {res.get('title', '')} ({res.get('url', '')})")
+                content = "\n".join([f for f in fields if f and f != '()'])
+            else:
+                content = f"Title: {title}\n\nSummary: {summary}"
+
             metadata = {"source": source_name, "title": title}
             if published_date:
-                 metadata['published_date'] = published_date # Add date to metadata
+                metadata['published_date'] = published_date
             if url:
-                 metadata['url'] = url # Add URL to metadata
+                metadata['url'] = url
 
             doc = Document(page_content=content, metadata=metadata)
             all_docs.append(doc)
