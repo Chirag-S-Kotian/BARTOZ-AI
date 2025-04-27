@@ -1,71 +1,169 @@
-### README.md
+# BARTOZ-AI: Open Source AI/ML/LLM Research Assistant
 
-# AI Research Assistant (AI, Agents, Companies Only)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-BARTOZ--AI-181717?logo=github)](https://github.com/Chirag-S-Kotian/BARTOZ-AI)
+[![Open Source](https://img.shields.io/badge/Open%20Source-Yes-brightgreen)](https://github.com/Chirag-S-Kotian/BARTOZ-AI)
+[![Stars](https://img.shields.io/github/stars/Chirag-S-Kotian/BARTOZ-AI?style=social)](https://github.com/Chirag-S-Kotian/BARTOZ-AI/stargazers)
 
-## Project Focus
-This assistant exclusively answers questions about **AI, AI agents, and AI companies**. Any unrelated queries will be politely declined.
+---
 
-## Features
-- Collects abstracts from arXiv, PubMed, and SSRN
-- Embeds and stores them using FAISS and HuggingFace
-- Supports semantic search and querying using Gemini or DeepSeek
-- **Strict topic filtering:** Only AI, AI agents, and AI companies are considered for context and answers
-- **Brief, accurate, up-to-date responses**
-- **Source citation and URLs** in every answer
-- **Unified RAG pipeline:** Both Gemini and DeepSeek use the same context and prompt template for consistent results
+> **by [Chirag S Kotian](https://github.com/Chirag-S-Kotian)**
 
-## Setup
+---
+
+## 🚀 What is BARTOZ-AI?
+
+**BARTOZ-AI** is a modern, open-source research assistant that answers questions strictly about:
+- Artificial Intelligence (AI)
+- Machine Learning (ML)
+- Large Language Models (LLMs)
+- AI Agents
+- Major AI Companies & Labs
+
+It combines Retrieval-Augmented Generation (RAG) with Gemini and DeepSeek models, and always provides up-to-date, source-cited answers.
+
+---
+
+## ✨ Features
+- **Unified RAG pipeline:** Consistent context for Gemini & DeepSeek
+- **Strict topic focus:** Only AI/ML/LLM/Agents/Companies
+- **Live sources:** OpenAI, DeepMind, Anthropic, Cohere, Hugging Face, Stability, arXiv, PubMed, SSRN, The Batch, and more
+- **Company/LLM metadata:** Founders, HQ, year, website, latest blog, and more
+- **Modern Streamlit UI:** Beautiful landing page, GitHub star button, open source branding
+- **Automated daily re-indexing**
+- **Easy to extend**: Add more sources or models
+
+---
+
+## 🖼️ Diagram: How BARTOZ-AI Works
+
+```
+[ User Query ]
+      |
+      v
+[ Streamlit UI ]
+      |
+      v
+[ FastAPI Backend ]
+      |
+      v
+[ RAG Pipeline ]
+      |
+      +--> [ Vectorstore (FAISS) ]
+      |        ^
+      |        |
+      |   [ Data Loader: arXiv, PubMed, SSRN, OpenAI, DeepMind, ... ]
+      |
+      v
+[ Gemini or DeepSeek Model ]
+      |
+      v
+[ Answer + Sources ]
+```
+
+---
+
+## 🏢 Example Companies & Labs (auto-enriched)
+
+| Name           | Founded | Founders                       | Headquarters        | Website                      | Latest Blog Title                |
+|----------------|---------|-------------------------------|---------------------|------------------------------|----------------------------------|
+| OpenAI         | 2015    | S. Altman, E. Musk, et al.    | San Francisco, USA  | https://openai.com           | (auto-fetched)                   |
+| DeepMind       | 2010    | D. Hassabis, S. Legg, M. Suleyman | London, UK     | https://deepmind.com         | (auto-fetched)                   |
+| Anthropic      | 2021    | D. Amodei, D. Amodei, et al.  | San Francisco, USA  | https://www.anthropic.com    | (auto-fetched)                   |
+| Cohere         | 2019    | A. Gomez, I. Zhang, et al.    | Toronto, Canada     | https://cohere.com           | (auto-fetched)                   |
+| Hugging Face   | 2016    | C. Delangue, J. Chaumond, T. Wolf | New York, USA  | https://huggingface.co       | (auto-fetched)                   |
+| Stability AI   | 2020    | E. Mostaque                   | London, UK          | https://stability.ai         | (auto-fetched)                   |
+| Google Research| 2006    | Google Inc.                   | Mountain View, USA  | https://research.google      | (auto-fetched)                   |
+| Microsoft Research| 1991 | B. Gates                      | Redmond, USA        | https://microsoft.com/research| (auto-fetched)                 |
+
+---
+
+## 🛠️ Setup
+
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Run the Ingestion Pipeline
+- Set your API keys in `.env`:
+  - `OPENROUTER_API_KEY` for DeepSeek
+  - `GEMINI_API_KEY` for Gemini
+
+---
+
+## ⚡ Usage
+
+### 1. Run the Ingestion Pipeline
 ```bash
 python rag_pipeline.py
 ```
 
-## Query Gemini or DeepSeek
+### 2. Start the Backend
+```bash
+uvicorn main:app --reload --port 8000
+```
+
+### 3. Launch the Frontend
+```bash
+streamlit run frontend/app.py
+```
+
+---
+
+### 4. Query Gemini or DeepSeek Directly
 ```python
 from openrouter_client import query_deepseek
 from gemini_client import query_gemini
 
-# Only ask questions about AI, AI agents, or AI companies
 print(query_deepseek("What is the latest breakthrough by OpenAI?"))
 # or
 import asyncio
 print(asyncio.run(query_gemini("Who are the leading AI agents in 2025?")))
 ```
 
-## Folder Structure
+---
+
+## 📂 Folder Structure
 ```
-ai-research-assistant/
+bartoz-ai/
 ├── data_loader.py
 ├── rag_pipeline.py
 ├── openrouter_client.py
 ├── gemini_client.py
+├── frontend/
+│   └── app.py
 ├── faiss_index/
 │   ├── index.faiss
 │   ├── index.pkl
 │   └── metadata.json
 ├── requirements.txt
 ├── .env
+├── scheduler.py
 └── README.md
 ```
 
-You’re now ready to run queries on your indexed research with either AI model!
+---
+
+## 🤝 Contributing
+- Star the repo ⭐ and open issues/PRs for features or bugfixes
+- Suggest new sources or models
+- All contributions welcome!
 
 ---
 
-## Further Enhancements (Suggested)
-- **More sources:** Add news feeds or company press releases for even more up-to-date AI info
-- **Advanced citation formatting:** Inline citations or footnotes
-- **Author and organization metadata:** Show who wrote each document
-- **Interactive web UI:** Use Streamlit or similar for a user-friendly chat experience
-- **User feedback loop:** Allow users to rate answers to improve retrieval and ranking
-- **Real-time updates:** Periodically refresh the FAISS index with the latest AI research and news
+## 🙋 FAQ
+- **Q: What questions does BARTOZ-AI answer?**
+  - Only questions about AI, ML, LLMs, AI agents, or major AI companies/labs.
+- **Q: How fresh is the info?**
+  - Data is refreshed daily from top sources and news feeds.
+- **Q: Can I add more sources?**
+  - Yes! Edit `data_loader.py` to add more fetchers.
 
 ---
 
-**Note:** This assistant will only answer questions strictly about AI, AI agents, or AI companies, and will always provide concise, accurate, and up-to-date information with sources.
+## 📣 License
+MIT License. See [LICENSE](LICENSE) for details.
+
+---
+
+**Made with ❤️ by [Chirag S Kotian](https://github.com/Chirag-S-Kotian) — [Star us on GitHub!](https://github.com/Chirag-S-Kotian/BARTOZ-AI)**

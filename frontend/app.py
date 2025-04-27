@@ -5,41 +5,71 @@ import re
 # --- Page Config & Sidebar ---
 st.set_page_config(page_title="AI Research Assistant", page_icon="🧠", layout="centered")
 
-# Sidebar: About, Tips, Features
+# Sidebar: About, Tips, Features, Open Source
 with st.sidebar:
     st.image("https://img.icons8.com/ios-filled/100/000000/artificial-intelligence.png", width=60)
     st.markdown("""
     # 🤖 About
-    **AI Research Assistant**
+    **BARTOZ-AI: Open Source AI Research Assistant**
     
-    This assistant **only answers questions about AI, AI agents, and AI companies**. Powered by RAG, Gemini, and DeepSeek.
+    **by [Chirag S Kotian](https://github.com/Chirag-S-Kotian)**
+    
+    [![GitHub Repo](https://img.shields.io/badge/GitHub-BARTOZ--AI-181717?logo=github)](https://github.com/Chirag-S-Kotian/BARTOZ-AI)
+    [![Open Source](https://img.shields.io/badge/Open%20Source-Yes-brightgreen)](https://github.com/Chirag-S-Kotian/BARTOZ-AI)
     
     ---
     ## 💡 Usage Tips
-    - Ask about the latest AI breakthroughs
-    - Compare AI agents or companies
+    - Ask about the latest AI/ML/LLM breakthroughs
+    - Compare AI agents, LLMs, or companies
     - Request sources for every answer
     
     **Examples:**
     - "Who are the top AI agents in 2025?"
     - "What is the latest research from OpenAI?"
     - "Compare Anthropic and Google DeepMind."
+    - "List major LLM companies and their products."
     
     ---
     ## 🚀 Latest Features
-    - Strict AI/agents/company focus
+    - Strict AI/ML/LLM/company focus
     - Brief, accurate, up-to-date answers
+    - Sources: OpenAI, DeepMind, Anthropic, The Batch, arXiv, PubMed, SSRN, and more
     - Source citation and URLs
     - Unified RAG pipeline for both models
+    - **Open Source: [Star us on GitHub!](https://github.com/Chirag-S-Kotian/BARTOZ-AI)**
     
     ---
-    [GitHub](#) | [Docs](#)
+    [GitHub](https://github.com/Chirag-S-Kotian/BARTOZ-AI) | [Docs](https://github.com/Chirag-S-Kotian/BARTOZ-AI#readme)
     """)
 
 # --- Main Landing Page ---
+# GitHub star button (live count)
+import requests as _requests
+from streamlit.components.v1 import html
+
+def github_star_button(user, repo):
+    api_url = f"https://api.github.com/repos/{user}/{repo}"
+    try:
+        stars = _requests.get(api_url, timeout=5).json().get("stargazers_count", "-")
+    except Exception:
+        stars = "-"
+    html(f'''<a href="https://github.com/{user}/{repo}" target="_blank" style="text-decoration:none;">
+    <button style="background:#181717;color:white;padding:8px 18px;border-radius:8px;border:none;font-size:1.1rem;display:flex;align-items:center;gap:10px;">
+    <img src="https://img.icons8.com/ios-glyphs/24/ffffff/github.png" style="vertical-align:middle;"> Star on GitHub <span style="background:#333;padding:2px 8px;border-radius:8px;margin-left:5px;">{stars}</span>
+    </button></a>''', height=44)
+
+github_star_button("Chirag-S-Kotian", "BARTOZ-AI")
+
 st.markdown("""
-<h1 style='text-align:center; font-size:2.5rem;'>🧠 AI Research Assistant</h1>
-<p style='text-align:center; font-size:1.2rem;'>Your expert assistant for all things <b>AI, AI agents, and AI companies</b>.<br>Powered by Retrieval-Augmented Generation (RAG), Gemini, and DeepSeek.</p>
+<h1 style='text-align:center; font-size:2.6rem;letter-spacing:2px;margin-bottom:0.2em;'>BARTOZ-AI</h1>
+<p style='text-align:center; font-size:1.25rem; color:#555; margin-top:0;'>
+  <b>Open Source AI/ML/LLM Research Assistant</b><br>
+  <span style='font-size:1.05rem;'>by <a href='https://github.com/Chirag-S-Kotian' target='_blank'>Chirag S Kotian</a></span>
+</p>
+<p style='text-align:center; font-size:1.05rem;'>
+  Your expert assistant for all things <b>AI, ML, LLMs, AI agents, and companies</b>.<br>
+  Powered by Retrieval-Augmented Generation (RAG), Gemini, DeepSeek, and open data sources.
+</p>
 """, unsafe_allow_html=True)
 
 st.markdown("<hr>", unsafe_allow_html=True)
@@ -132,8 +162,8 @@ if submitted:
 # --- Footer ---
 st.markdown("""
 <hr>
-<div style='text-align:center;font-size:0.9rem;color:#666;margin-top:2em;'>
-  Made with ❤️ using LangChain, Gemini, DeepSeek, and Streamlit.<br>
-  <a href='#'>Docs</a> | <a href='#'>GitHub</a>
+<div style='text-align:center;font-size:1rem;color:#444;margin-top:2em;'>
+  Made with ❤️ by <a href='https://github.com/Chirag-S-Kotian' target='_blank'>Chirag S Kotian</a> | <a href='https://github.com/Chirag-S-Kotian/BARTOZ-AI' target='_blank'>BARTOZ-AI Repo</a><br>
+  <span style='font-size:0.95rem;'>Open Source · Powered by LangChain, Gemini, DeepSeek, and Streamlit</span>
 </div>
 """, unsafe_allow_html=True)
