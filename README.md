@@ -1,10 +1,28 @@
-# BARTOZ-AI: Open Source AI/LLM/Agent Research Assistant
+# 🧠 BARTOZ-AI: Open Source AI/LLM/Agent Research Assistant
 
-![GitHub](https://img.shields.io/badge/GitHub-BARTOZ--AI-181717?logo=github) ![Open Source](https://img.shields.io/badge/Open%20Source-Yes-brightgreen) ![Stars](https://img.shields.io/github/stars/Chirag-S-Kotian/BARTOZ-AI?style=social)
+<p align="center">
+  <a href="https://github.com/Chirag-S-Kotian/BARTOZ-AI">
+    <img alt="GitHub stars" src="https://img.shields.io/github/stars/Chirag-S-Kotian/BARTOZ-AI?style=social">
+  </a>
+  <a href="https://github.com/Chirag-S-Kotian/BARTOZ-AI/blob/main/LICENSE">
+    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg">
+  </a>
+  <a href="https://github.com/Chirag-S-Kotian/BARTOZ-AI/actions">
+    <img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/Chirag-S-Kotian/BARTOZ-AI/ci.yml?branch=main">
+  </a>
+  <img alt="Python Version" src="https://img.shields.io/badge/python-3.9%2B-blue">
+  <img alt="LangChain" src="https://img.shields.io/badge/Made%20with-LangChain-4B275F?logo=langchain">
+  <img alt="Streamlit" src="https://img.shields.io/badge/UI-Streamlit-FF4B4B?logo=streamlit">
+  <img alt="Gemini" src="https://img.shields.io/badge/LLM-Gemini-4285F4?logo=google">
+  <img alt="DeepSeek" src="https://img.shields.io/badge/LLM-DeepSeek-00897B">
+  <img alt="Async" src="https://img.shields.io/badge/Async-Enabled-8BC34A">
+</p>
 
 ---
 
-BARTOZ-AI is a modern, open-source Retrieval-Augmented Generation (RAG) system focused on AI, LLMs, agents, and major AI companies. It combines scalable async ingestion (1000+ docs), robust deduplication, and a beautiful Streamlit UI, powered by Gemini and DeepSeek models. Always up-to-date, always cited.
+> <span style="font-size:1.1em;">BARTOZ-AI is a modern, open-source Retrieval-Augmented Generation (RAG) system focused on <b>AI, LLMs, agents, and major AI companies</b>. It combines scalable async ingestion (1000+ docs), robust deduplication, and a beautiful Streamlit UI, powered by Gemini and DeepSeek models. <b>Always up-to-date, always cited.</b></span>
+
+---
 
 
 [![GitHub Repo](https://img.shields.io/badge/GitHub-BARTOZ--AI-181717?logo=github)](https://github.com/Chirag-S-Kotian/BARTOZ-AI)
@@ -14,6 +32,13 @@ BARTOZ-AI is a modern, open-source Retrieval-Augmented Generation (RAG) system f
 ---
 
 ## 🚀 Features
+
+> <img src="https://img.shields.io/badge/-AI%20Research%20Assistant-blueviolet?style=flat-square&logo=ai" align="left" />
+> 
+> <b>BARTOZ-AI</b> offers a modern async RAG pipeline, beautiful UI, and up-to-date, source-cited answers about AI, LLMs, agents, and companies. 
+> 
+> <span style="color:#43a047;"><b>✨ Scalable, extensible, and open source.</b></span>
+
 - **Async Data Loader**: Ingests 1000+ docs from arXiv, company blogs, news, and more (see `data_sources_config.py`).
 - **Modern RAG Pipeline**: Unified context for Gemini & DeepSeek; scalable vectorstore (FAISS).
 - **Beautiful Streamlit UI**: Responsive, theme toggle, live model health, database preview.
@@ -25,6 +50,7 @@ BARTOZ-AI is a modern, open-source Retrieval-Augmented Generation (RAG) system f
 ---
 
 ## ⚡ Quickstart
+
 
 1. **Clone the repo:**
    ```bash
@@ -90,6 +116,7 @@ It combines Retrieval-Augmented Generation (RAG) with Gemini and DeepSeek models
 ---
 
 ## 🏗️ Architecture Overview
+
 
 ```
 [ User (Streamlit UI) ]
@@ -175,6 +202,7 @@ pip install -r requirements.txt
 
 ## 🛠️ Setup & Usage
 
+
 1. **Clone and Install**
    ```bash
    git clone https://github.com/Chirag-S-Kotian/BARTOZ-AI.git
@@ -206,6 +234,9 @@ pip install -r requirements.txt
 ---
 
 ## 💡 Advanced Usage
+
+> 💡 <b>Tip:</b> To maximize document coverage, increase <code>max_docs</code> in <code>fetch_all_sources()</code> or add sources in <code>data_sources_config.py</code>. Use <code>scheduler.py</code> for automation.
+
 - **Increase document coverage:** Edit `max_docs` in `fetch_all_sources()` in `rag_pipeline.py` or add more sources in `data_sources_config.py`.
 - **Add new models:** Extend `gemini_client.py` or `openrouter_client.py`.
 - **Automate ingestion:** Use `scheduler.py` to set up regular re-indexing.
@@ -242,7 +273,8 @@ print(asyncio.run(query_gemini("Who are the leading AI agents in 2025?")))
 
 ---
 
-## 📂 Project Structure
+## 🗂️ Project Structure
+
 
 ```
 bartoz-ai/
@@ -282,6 +314,7 @@ bartoz-ai/
 ---
 
 ## 🤝 Contributing
+
 - Star ⭐ the repo and open issues/PRs for bugs, features, or new sources
 - Suggest new sources or models (see `data_sources_config.py`)
 - All contributions welcome!
@@ -293,6 +326,7 @@ bartoz-ai/
 ---
 
 ## 🧩 Troubleshooting & FAQ
+
 
 - **Q: Streamlit duplicate key error?**
   - Ensure every `st.button` or widget in `app.py` uses a unique `key` (especially in the sidebar).
@@ -315,6 +349,7 @@ bartoz-ai/
 ---
 
 ## 📄 License
+
 MIT License. See [LICENSE](LICENSE) for details.
 
 ---
