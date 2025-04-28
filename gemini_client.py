@@ -54,16 +54,23 @@ async def gemini_query(prompt: str) -> str:
         # The 'prompt' argument passed to this function *must* contain the user's
         # original query combined with the relevant context retrieved by your RAG pipeline,
         # and the context should ideally include source titles and URLs.
-        formatted_prompt = f"""You are an AI research assistant specializing in AI, AI agents, and Machine Learning. Answer the user's question based *only* on the research context provided below.
+        # Truncate context if too long (Gemini supports ~16k tokens; be conservative)
+        max_chars = 20000
+        safe_prompt = prompt if len(prompt) < max_chars else prompt[:max_chars] + "\n[Context truncated due to length limit]"
 
-Focus your answer specifically on aspects related to AI, AI agents, and Machine Learning found within the context.
+        formatted_prompt = f"""
+You are an expert AI/ML/LLM research assistant.
+STRICT INSTRUCTIONS:
+- ONLY answer using the information provided in the [RESEARCH CONTEXT] below.
+- NEVER use prior knowledge, training data, or make up answers. If the answer is not found, say: 'Sorry, the answer was not found in the provided research context.'
+- Provide a concise, focused summary (max 5 sentences, only essential facts).
+- For every fact, always cite the source title and URL from the context.
 
-Structure your answer clearly. For each piece of information you use, cite the source title and provide the URL from the context if available.
+[RESEARCH CONTEXT]
+{safe_prompt}
+[END OF CONTEXT]
 
-If the provided research context does not contain sufficient information to answer the question, especially regarding AI, AI agents, or Machine Learning, state that you cannot answer based on the provided context.
-
-Research Context and User Question:
-{prompt}
+[USER QUESTION IS INCLUDED ABOVE]
 
 Answer:"""
         # --- End Refined Prompt ---

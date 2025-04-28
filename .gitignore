@@ -33,6 +33,9 @@ faiss_index/
 *.log
 *.sqlite3
 
+# Cache
+cache/
+
 # Jupyter notebooks checkpoints (if any)
 .ipynb_checkpoints/
 

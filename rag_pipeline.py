@@ -213,25 +213,16 @@ def retrieve_context(query: str, vectorstore: FAISS, k: int = 2, diversify_sourc
 
         # --- Expanded AI-Related Keywords ---
         global keywords
-        keywords = [
-            'ai', 'artificial intelligence', 'machine learning', 'ml', 'deep learning', 'llm', 'large language model',
-            'agent', 'agents', 'autonomous', 'autonomy', 'company', 'companies', 'startup', 'foundation', 'research', 'anthropic', 'openai',
-            'google', 'deepmind', 'meta', 'facebook', 'microsoft', 'hugging face', 'stability', 'cohere', 'mistral',
-            'llama', 'gpt', 'gemini', 'palm', 'bard', 'chatgpt', 'crew ai', 'crewai', 'databricks', 'databricks', 'xai', 'elon', 'tesla', 'nvidia', 'stability ai', 'deeplearning.ai', 'the batch', 'the gradient', 'venturebeat', 'arxiv', 'pubmed', 'ssrn', 'research paper', 'blog', 'news', 'newsletter', 'project', 'product', 'ceo', 'funding', 'valuation', 'founder', 'headquarters', 'timeline', 'milestone', 'paper', 'publication', 'release', 'update', 'announcement',
-            'ai agent', 'ai agents', 'llm', 'llms', 'foundation model', 'foundation models', 'transformer', 'transformers', 'neural network', 'neural networks', 'language model', 'language models', 'sora', 'video generation', 'text to video', 'text to image', 'diffusion', 'stable diffusion', 'clip', 'dalle', 'midjourney', 'perplexity', 'phi', 'orca', 'wizardlm', 'vicuna', 'alpaca', 'falcon', 'mpt', 'bloom', 'grok', 'xai', 'leela', 'reka', 'llamaindex', 'langchain', 'prompt', 'prompt engineering', 'retrieval', 'rag', 'retrieval augmented generation', 'inference', 'fine-tuning', 'finetune', 'finetuning', 'open source ai', 'open source llm', 'api', 'cloud ai', 'api.ai', 'agents', 'autogen', 'autogenstudio', 'agentic', 'agentic ai', 'agent framework', 'agent frameworks', 'agentic workflow', 'agentic workflows', 'ai platform', 'ai platforms', 'ai ecosystem', 'ai stack', 'ai system', 'ai systems', 'ai research', 'ai safety', 'alignment', 'capabilities', 'benchmarks', 'leaderboard', 'eval', 'evaluation', 'metrics', 'hallucination', 'citation', 'chain of thought', 'cot', 'reasoning', 'multimodal', 'multimodality', 'vision', 'audio', 'speech', 'speech to text', 'text to speech', 'tts', 'stt', 'voice', 'voice ai', 'embeddings', 'embedding', 'vector', 'vector search', 'vector db', 'qdrant', 'weaviate', 'milvus', 'pinecone', 'faiss', 'chromadb', 'vectara', 'haystack', 'haystack ai', 'semantic', 'semantic search', 'semantic retrieval', 'dense retrieval', 'sparse retrieval', 'bm25', 'hybrid retrieval', 'hybrid search', 'hybrid rag', 'hybrid model', 'hybrid pipeline', 'hybrid agent', 'hybrid workflow', 'hybrid system', 'hybrid architecture', 'hybrid approach', 'hybrid framework', 'hybrid platform', 'hybrid ecosystem', 'hybrid stack', 'hybrid system', 'hybrid ai', 'hybrid llm', 'hybrid agent', 'hybrid agentic', 'hybrid agentic ai', 'hybrid agentic workflow', 'hybrid agentic system', 'hybrid agentic platform', 'hybrid agentic ecosystem', 'hybrid agentic stack', 'hybrid agentic system', 'hybrid agentic ai', 'hybrid agentic llm', 'hybrid agentic agent', 'hybrid agentic agentic', 'hybrid agentic agentic ai', 'hybrid agentic agentic workflow', 'hybrid agentic agentic system', 'hybrid agentic agentic platform', 'hybrid agentic agentic ecosystem', 'hybrid agentic agentic stack', 'hybrid agentic agentic system', 'hybrid agentic agentic ai', 'hybrid agentic agentic llm', 'hybrid agentic agentic agent', 'hybrid agentic agentic agentic', 'hybrid agentic agentic agentic ai', 'hybrid agentic agentic agentic workflow', 'hybrid agentic agentic agentic system', 'hybrid agentic agentic agentic platform', 'hybrid agentic agentic agentic ecosystem', 'hybrid agentic agentic agentic stack', 'hybrid agentic agentic agentic system', 'hybrid agentic agentic agentic ai', 'hybrid agentic agentic agentic llm', 'hybrid agentic agentic agentic agent', 'hybrid agentic agentic agentic agentic', 'hybrid agentic agentic agentic agentic ai', 'hybrid agentic agentic agentic agentic workflow', 'hybrid agentic agentic agentic agentic system', 'hybrid agentic agentic agentic agentic platform', 'hybrid agentic agentic agentic agentic ecosystem', 'hybrid agentic agentic agentic agentic stack', 'hybrid agentic agentic agentic agentic system', 'hybrid agentic agentic agentic agentic ai', 'hybrid agentic agentic agentic agentic llm', 'hybrid agentic agentic agentic agentic agent'
-        ]
-
+        # --- AI-Related Filtering ---
         def is_ai_related(text):
             text_lower = text.lower()
+            keywords = ["ai","artificial intelligence","machine learning","llm","agent","agents","company","companies"]
             return any(kw in text_lower for kw in keywords)
-
-        # --- AI-Related Filtering ---
         filtered_docs = [doc for doc in docs if is_ai_related(doc.page_content) or is_ai_related(doc.metadata.get('title', ''))]
         logging.info(f"AI-related docs found: {len(filtered_docs)} / {len(docs)} for query: '{query}'")
 
-        # --- Fallback: BM25/Keyword Search if too few results ---
+        # Fallback: if too few, use keyword overlap
         if len(filtered_docs) < k:
-            # Simple keyword search fallback (BM25-like): rank all docs by keyword overlap
             scored = []
             query_terms = set(query.lower().split())
             for doc in docs:
@@ -240,28 +231,23 @@ def retrieve_context(query: str, vectorstore: FAISS, k: int = 2, diversify_sourc
                 scored.append((score, doc))
             scored.sort(reverse=True, key=lambda x: x[0])
             fallback_docs = [doc for score, doc in scored if score > 0][:k]
-            # If still not enough, just take the top-k by dense similarity
             if len(fallback_docs) < k:
                 fallback_docs = docs[:k]
             filtered_docs = filtered_docs + [doc for doc in fallback_docs if doc not in filtered_docs]
-        # Always return at least k docs
-        filtered_docs = filtered_docs[:k]
-        # Fallback: if still empty, return the top k most recent docs
+        filtered_docs = filtered_docs[:k*2]
         if not filtered_docs:
             docs_sorted = sorted(docs, key=lambda d: d.metadata.get('published_date', ''), reverse=True)
             filtered_docs = docs_sorted[:k]
-        logging.info(f"Found {len(docs)} relevant documents before dedup/diversity.")
 
         # Deduplicate by title+source
         seen = set()
         deduped_docs = []
-        for doc in docs:
+        for doc in filtered_docs:
             key = (doc.metadata.get('title', '').strip().lower(), doc.metadata.get('source', '').strip().lower())
             if key in seen:
                 continue
             seen.add(key)
             deduped_docs.append(doc)
-        logging.info(f"Deduplicated to {len(deduped_docs)} documents.")
 
         # Source diversity: try to balance sources
         if diversify_sources:
@@ -269,7 +255,6 @@ def retrieve_context(query: str, vectorstore: FAISS, k: int = 2, diversify_sourc
             for doc in deduped_docs:
                 src = doc.metadata.get('source', 'unknown')
                 by_source.setdefault(src, []).append(doc)
-            # Round-robin select up to k
             selected = []
             while len(selected) < k and any(by_source.values()):
                 for src in list(by_source.keys()):
@@ -282,144 +267,85 @@ def retrieve_context(query: str, vectorstore: FAISS, k: int = 2, diversify_sourc
             docs_final = deduped_docs[:k]
         logging.info(f"Selected {len(docs_final)} documents after source diversity.")
 
-        # --- Boost by recency and query keyword match ---
+        # Boost by recency and query keyword match
         from datetime import datetime
         def parse_date(date_str):
             try:
                 return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
             except Exception:
                 return datetime.min
-        query_keywords = [w.lower() for w in query.split() if len(w) > 2]
         def boost_score(doc):
             score = 0
             title = doc.metadata.get('title', '').lower()
             content = doc.page_content.lower()
+            query_keywords = [w.lower() for w in query.split() if len(w) > 2]
             if any(qk in title or qk in content for qk in query_keywords):
                 score += 2
-            if 'openai' in title or 'openai' in content:
-                score += 3
-            # Add more orgs if desired
             date_str = doc.metadata.get('published_date', '')
             score += (parse_date(date_str).timestamp() if date_str else 0) / 1e12
             return score
         docs_final.sort(key=boost_score, reverse=True)
 
-        # Filter/prioritize context chunks mentioning AI, AI agents, or AI companies or query keywords
-        keywords = ["ai", "artificial intelligence", "ai agent", "ai agents", "ai company", "ai companies"] + query_keywords
-        def is_ai_related(text):
-            text_lower = text.lower()
-            return any(kw in text_lower for kw in keywords)
-        filtered_docs = [doc for doc in docs_final if is_ai_related(doc.page_content) or is_ai_related(doc.metadata.get('title', ''))]
-        # Loosen filtering: if at least 1, use, else fallback to top k most relevant
-        if len(filtered_docs) >= 1:
-            docs_to_use = filtered_docs[:k]
-        else:
-            # Fallback: always provide top k most relevant context
-            docs_to_use = docs_final[:k]
-        # TODO: Integrate more sources (OpenAI blog, AI news, etc) in data_loader.py and indexing.
-
-        # Format context
+        # Format context for LLM: concise, clear, always with title/source/url
         context_parts = []
-        for i, doc in enumerate(docs_to_use):
+        for i, doc in enumerate(docs_final[:k]):
             title = doc.metadata.get('title', 'No Title')
             source = doc.metadata.get('source', 'Unknown Source')
             url = doc.metadata.get('url', 'No URL Available')
             published_date = doc.metadata.get('published_date', 'No Date Available')
             content = doc.page_content
-            context_parts.append(f"--- Document {i+1} ---\n")
-            context_parts.append(f"Title: {title}\n")
-            context_parts.append(f"Source: {source}\n")
-            if url != 'No URL Available':
-                context_parts.append(f"URL: {url}\n")
-            if published_date != 'No Date Available':
-                context_parts.append(f"Published: {published_date}\n")
-            context_parts.append(f"Content: {content}\n")
+            context_parts.append(f"--- Document {i+1} ---\nTitle: {title}\nSource: {source}\nURL: {url}\nPublished: {published_date}\nContent: {content}\n")
         context = "\n".join(context_parts)
         formatted_context_prompt = f"""
-You are an expert AI/ML/LLM research assistant.
-STRICT INSTRUCTIONS:
-- Provide a brief, focused summary (3–5 sentences, only essential facts).
+You are an expert AI/ML/LLM research assistant. STRICT INSTRUCTIONS:
+- Provide a brief, focused answer (3–5 sentences, only essential facts).
 - ONLY answer using the information provided in the context below.
 - If the answer is not found in the context, reply: 'Sorry, the answer was not found in the provided research context.'
 - Do NOT use prior knowledge or make up answers.
 - Always cite the source title and URL for any fact.
 
----
 [RESEARCH CONTEXT]
 {context}
----
 [USER QUESTION]
 {query}
----
-Provide a brief, accurate answer using only the context above. If not found, say so.
+Answer:
 """
         return formatted_context_prompt
     except Exception as e:
         logging.error(f"Error during context retrieval: {e}", exc_info=True)
         return f"User Query: {query}\n\nRelevant Context:\nError during retrieval: {e}"
 
-
 # --- Answer fetching part ---
 # This function must be async because it calls async functions (like gemini_query)
 async def get_research_answer(query: str, model: str) -> str:
     """
     Fetches a research answer using the specified model after retrieving context.
-
     Args:
         query: The user's original query.
         model: The name of the model to use ("gemini" or "deepseek").
-
     Returns:
         The answer generated by the model (string), or an error message (string).
     """
     logging.info(f"Received query for model: {model}")
-
-    # Step 1: Retrieve relevant context based on the user's query
-    # Pass the global vectorstore object to the retrieval function
-    # Check if vectorstore was initialized successfully
     if 'vectorstore' not in globals() or vectorstore is None:
-         logging.error("Vectorstore is not available. Cannot process query.")
-         return "Error: Research index not available. Please check backend startup logs."
-
+        logging.error("Vectorstore is not available. Cannot process query.")
+        return "Error: Research index not available. Please check backend startup logs."
     rag_prompt_with_context = retrieve_context(query, vectorstore)
     logging.info("Context retrieval step completed.")
-    # Optional: Log the full prompt being sent to the LLM (can be verbose)
-    # logging.debug(f"Full prompt sent to LLM:\n{rag_prompt_with_context}")
-
-
     try:
-        # Step 2: Pass the context-augmented prompt to the selected model
         if model == "gemini":
-            logging.info("Calling Gemini model with unified RAG prompt...")
-            try:
-                from gemini_client import gemini_query
-                response = await gemini_query(rag_prompt_with_context)
-                logging.info("Received response from Gemini.")
-                return response
-            except Exception as e:
-                logging.error(f"Error calling Gemini: {e}", exc_info=True)
-                return f"Error calling Gemini: {e}"
-
+            from gemini_client import gemini_query
+            response = await gemini_query(rag_prompt_with_context)
+            logging.info("Received response from Gemini.")
+            return response
         elif model == "deepseek":
-            logging.info("Calling DeepSeek model with unified RAG prompt...")
-            try:
-                from openrouter_client import openrouter_query
-                response = openrouter_query(rag_prompt_with_context)
-                logging.info("Received response from DeepSeek.")
-                return response
-            except Exception as e:
-                logging.error(f"Error calling DeepSeek: {e}", exc_info=True)
-                return f"Error calling DeepSeek: {e}"
-
-
+            from openrouter_client import openrouter_query_async
+            response = await openrouter_query_async(rag_prompt_with_context)
+            logging.info("Received response from DeepSeek.")
+            return response
         else:
             logging.warning(f"Unsupported model selected: {model}")
-            return "Unsupported model selected." # Returns a string
-
+            return "Unsupported model selected."
     except Exception as e:
-        logging.error(f"Error in get_research_answer: {e}", exc_info=True) # Log traceback
-        # Return an error message string so the FastAPI endpoint receives a serializable value.
-        # This prevents the JSON encoding error in the endpoint.
+        logging.error(f"Error in get_research_answer: {e}", exc_info=True)
         return f"An error occurred while fetching the answer: {e}"
-        # If you prefer the FastAPI endpoint to catch and handle the exception:
-        # raise # Re-raise the exception (but you'd need error handling in the endpoint)

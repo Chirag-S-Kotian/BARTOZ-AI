@@ -95,7 +95,8 @@ def fetch_ai_companies():
             "valuation": "$80-90B (2023)",
             "funding": "$11.3B+",
             "twitter": "https://twitter.com/openai",
-            "latest_blog": (fetch_openai_blog(1)[0] if 'fetch_openai_blog' in globals() and fetch_openai_blog(1) else {"title": "See OpenAI blog", "url": "https://openai.com/blog"})
+            # Defensive: only call fetch_openai_blog(1) once and check for result
+            "latest_blog": (lambda blogs: blogs[0] if blogs else {"title": "See OpenAI blog", "url": "https://openai.com/blog"})(fetch_openai_blog(1) if 'fetch_openai_blog' in globals() else [])
         },
         {
             "name": "DeepMind",
