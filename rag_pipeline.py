@@ -123,7 +123,7 @@ try:
         async_resources = asyncio.run(fetch_all_sources())
         logging.info(f"Fetched {len(async_resources)} async resources.")
         for res in async_resources:
-            content = f"Resource Title: {res['title']}\nSource: {res['source']}\nCompany: {res.get('company','')}\nType: {res['type']}\nURL: {res['url']}\nPublished: {res.get('published_date','')}\nSummary: {res.get('summary','')}"
+            content = f"Resource Title: {res['title']}\nSource: {res['source']}\nCompany: {res.get('company','')}\nType: {res['type']}\nURL: {res['url']}\nPublished: {res.get('published_date','')}\nSummary: {res.get('summary','')}\n\nFull Content: {res.get('content', '')}"
             # Optionally, could fetch article content and append here
             metadata = {
                 "source": res['source'],

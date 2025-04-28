@@ -12,15 +12,22 @@ async def fetch_rss(session, source):
         feed = feedparser.parse(text)
         items = []
         for entry in feed.entries:
-            items.append({
-                'title': entry.title,
-                'summary': getattr(entry, 'summary', ''),
-                'published_date': getattr(entry, 'published', ''),
-                'url': entry.link,
-                'source': source['name'],
-                'company': source.get('company', ''),
-                'type': source['type']
-            })
+             # Try to fetch article content
+             content = ''
+             try:
+                 content = await fetch_article_content(session, entry.link)
+             except Exception:
+                 content = ''
+             items.append({
+                 'title': entry.title,
+                 'summary': getattr(entry, 'summary', ''),
+                 'published_date': getattr(entry, 'published', ''),
+                 'url': entry.link,
+                 'source': source['name'],
+                 'company': source.get('company', ''),
+                 'type': source['type'],
+                 'content': content
+             })
         return items
     except Exception as e:
         print(f"Error fetching {source['name']}: {e}")
