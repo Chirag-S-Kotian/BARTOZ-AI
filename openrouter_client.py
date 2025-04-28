@@ -1,6 +1,7 @@
 from openai import OpenAI
 import os
 import requests # Import requests for better error handling
+import aiohttp
 
 # Initialize the OpenAI client pointing to OpenRouter API
 # Ensure OPENROUTER_API_KEY is set in your environment
