@@ -2,6 +2,7 @@
 # Ensure these libraries are installed:
 # pip install langchain-community faiss-cpu sentence-transformers
 from data_loader import fetch_arxiv, fetch_pubmed, fetch_ssrn, fetch_ai_companies
+from cache_loader import load_cached_documents
 import asyncio
 from async_data_loader import fetch_all_sources
 from langchain_community.embeddings import HuggingFaceEmbeddings
@@ -34,17 +35,22 @@ try:
     os.makedirs("faiss_index", exist_ok=True)
 
     all_docs = []
+    # --- Load cached documents ---
+    cached_docs = load_cached_documents()
+    logging.info(f"Loaded {len(cached_docs)} cached documents from cache directory.")
+    all_docs.extend(cached_docs)
+
+    # --- Fetch new data from sources ---
     logging.info("Fetching data from sources...")
-    # Note: Ensure your fetch functions add metadata like 'published_date' and 'url'
     sources = {
-        "arxiv": fetch_arxiv(), # Assuming fetch_arxiv returns data synchronously with metadata
-        "pubmed": fetch_pubmed(), # Assuming fetch_pubmed returns data synchronously with metadata
-        "ssrn": fetch_ssrn(), # Assuming fetch_ssrn returns data synchronously with metadata
-        "ai_companies": fetch_ai_companies() # New: company/LLM/agent info
+        "arxiv": fetch_arxiv(),
+        "pubmed": fetch_pubmed(),
+        "ssrn": fetch_ssrn(),
+        "ai_companies": fetch_ai_companies()
     }
     logging.info("Data fetching complete.")
 
-    logging.info("Creating Langchain Documents...")
+    logging.info("Creating Langchain Documents from fetched sources...")
     for source_name, papers in sources.items():
         for paper in papers:
             # Ensure paper has 'title', 'summary', and ideally 'published_date', 'url' keys
@@ -119,30 +125,24 @@ try:
 
     # Fetch and add async resources from additional sources
     # To increase document count, raise max_docs below (e.g., 2000, 5000)
-    logging.info("Fetching additional async resources from AI/ML/LLM news/blog/research sources...")
-    try:
-        async_resources = asyncio.run(fetch_all_sources(max_docs=1200))
-        logging.info(f"Fetched {len(async_resources)} async resources (news/blog/research).")
-        for res in async_resources:
-            content = f"Resource Title: {res['title']}\nSource: {res['source']}\nCompany: {res.get('company','')}\nType: {res['type']}\nURL: {res['url']}\nPublished: {res.get('published_date','')}\nSummary: {res.get('summary','')}\n\nFull Content: {res.get('content', '')}"
-            metadata = {
-                "source": res['source'],
-                "title": res['title'],
-                "url": res['url'],
-                "company": res.get('company',''),
-                "type": res['type'],
-                "published_date": res.get('published_date','')
-            }
-            all_docs.append(Document(page_content=content, metadata=metadata))
-        logging.info(f"Total documents after async ingestion: {len(all_docs)}")
-    except Exception as e:
-        logging.error(f"Error fetching async resources: {e}")
+    # Async fetch moved to FastAPI startup event. See main.py for ingestion.
+    pass
 
-    logging.info(f"Created {len(all_docs)} documents.")
+    # Deduplicate all_docs by URL (prefer most recent)
+    seen_urls = set()
+    deduped_docs = []
+    for doc in all_docs:
+        url = doc.metadata.get("url", "")
+        if url and url not in seen_urls:
+            deduped_docs.append(doc)
+            seen_urls.add(url)
+        elif not url:
+            deduped_docs.append(doc)  # Always include docs with no URL (e.g., static or malformed)
+    logging.info(f"Deduplicated to {len(deduped_docs)} unique documents (by URL).")
 
     logging.info("Splitting documents...")
     splitter = RecursiveCharacterTextSplitter(chunk_size=2500, chunk_overlap=300)
-    texts = splitter.split_documents(all_docs)
+    texts = splitter.split_documents(deduped_docs)
     logging.info(f"Split into {len(texts)} chunks.")
 
     # Define the path for the FAISS index
@@ -182,7 +182,7 @@ except Exception as e:
 
 # --- RAG Retrieval Logic ---
 # This function now uses the vectorstore to find relevant context.
-def retrieve_context(query: str, vectorstore: FAISS, k: int = 2, diversify_sources: bool = True, date_from: str = None, date_to: str = None) -> str:
+def retrieve_context(query: str, vectorstore: FAISS, k: int = 6, diversify_sources: bool = True, date_from: str = None, date_to: str = None) -> str:
     """
     Advanced RAG context retrieval: deduplicate, diversify, enrich metadata, allow dynamic k.
     """
@@ -191,6 +191,7 @@ def retrieve_context(query: str, vectorstore: FAISS, k: int = 2, diversify_sourc
         return f"User Query: {query}\n\nRelevant Context:\nError: Vectorstore not available."
     try:
         logging.info(f"Performing similarity search for query: {query}")
+        # Increased k for more context (default k=6, so 36 chunks)
         docs: List[Document] = vectorstore.similarity_search(query, k=k*6) # get more for dedup/diversity
 
         # --- Temporal Filtering (if requested) ---
@@ -234,7 +235,8 @@ def retrieve_context(query: str, vectorstore: FAISS, k: int = 2, diversify_sourc
             if len(fallback_docs) < k:
                 fallback_docs = docs[:k]
             filtered_docs = filtered_docs + [doc for doc in fallback_docs if doc not in filtered_docs]
-        filtered_docs = filtered_docs[:k*2]
+        # Pass more context to the model (up to k*4, e.g., 24 chunks)
+        filtered_docs = filtered_docs[:k*4]
         if not filtered_docs:
             docs_sorted = sorted(docs, key=lambda d: d.metadata.get('published_date', ''), reverse=True)
             filtered_docs = docs_sorted[:k]
@@ -270,10 +272,21 @@ def retrieve_context(query: str, vectorstore: FAISS, k: int = 2, diversify_sourc
         # Boost by recency and query keyword match
         from datetime import datetime
         def parse_date(date_str):
+            from datetime import datetime
             try:
+                # Try ISO format
                 return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
             except Exception:
-                return datetime.min
+                # Try YYYY-MM-DD or YYYY/MM/DD
+                import re
+                m = re.match(r'(\d{4})[-/](\d{2})[-/](\d{2})', date_str or '')
+                if m:
+                    try:
+                        return datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+                    except Exception:
+                        pass
+                # If still fails, return a safe default (1970-01-01)
+                return datetime(1970, 1, 1)
         def boost_score(doc):
             score = 0
             title = doc.metadata.get('title', '').lower()
@@ -282,35 +295,36 @@ def retrieve_context(query: str, vectorstore: FAISS, k: int = 2, diversify_sourc
             if any(qk in title or qk in content for qk in query_keywords):
                 score += 2
             date_str = doc.metadata.get('published_date', '')
-            score += (parse_date(date_str).timestamp() if date_str else 0) / 1e12
+            try:
+                date_val = parse_date(date_str)
+                score += (date_val.timestamp()) / 1e12
+            except Exception:
+                score += 0
             return score
         docs_final.sort(key=boost_score, reverse=True)
 
-        # Format context for LLM: concise, clear, always with title/source/url
-        context_parts = []
-        for i, doc in enumerate(docs_final[:k]):
-            title = doc.metadata.get('title', 'No Title')
-            source = doc.metadata.get('source', 'Unknown Source')
-            url = doc.metadata.get('url', 'No URL Available')
-            published_date = doc.metadata.get('published_date', 'No Date Available')
-            content = doc.page_content
-            context_parts.append(f"--- Document {i+1} ---\nTitle: {title}\nSource: {source}\nURL: {url}\nPublished: {published_date}\nContent: {content}\n")
-        context = "\n".join(context_parts)
-        formatted_context_prompt = f"""
-You are an expert AI/ML/LLM research assistant. STRICT INSTRUCTIONS:
-- Provide a brief, focused answer (3–5 sentences, only essential facts).
-- ONLY answer using the information provided in the context below.
-- If the answer is not found in the context, reply: 'Sorry, the answer was not found in the provided research context.'
-- Do NOT use prior knowledge or make up answers.
-- Always cite the source title and URL for any fact.
+        # Format context for LLM: detailed, clear, always with title/source/url
+        context_blocks = []
+        for idx, doc in enumerate(docs_final):
+            context_blocks.append(f"--- Document {idx+1} ---\nTitle: {doc.metadata.get('title', 'N/A')}\nSource: {doc.metadata.get('source', 'N/A')}\nPublished: {doc.metadata.get('published_date', 'N/A')}\nURL: {doc.metadata.get('url', 'N/A')}\nContent: {doc.page_content}")
+        context_str = "\n\n".join(context_blocks)
+        # Compose the prompt to instruct for detailed, comprehensive answers
+        prompt = f"""
+Research Context:
+{context_str}
 
-[RESEARCH CONTEXT]
-{context}
-[USER QUESTION]
-{query}
+User Question: {query}
+
+Instructions:
+- Provide a detailed, comprehensive answer using all relevant information from the context above.
+- Cite sources (title and URL) for every fact or claim.
+- If the answer is not found in the context, reply with the following detailed message:
+  Sorry, the answer to your question could not be found in the provided research context. This means that, based on the indexed documents, there is currently no relevant or up-to-date information available to fully answer your query. The research context may include historical papers, summaries, or references to related topics, but does not contain a direct or comprehensive answer to your specific question. Please note: All indexed documents are preserved unless you manually delete the faiss_index directory. If you believe relevant research should be present, try re-indexing your sources or broadening your query. The database may contain older research (e.g., historical arXiv papers from 1995/1996) or recent papers on related but not identical topics (like LLM chatbots or general AI advances). For the most accurate results, ensure your question closely matches the topics and timeframes covered by the indexed documents. If you need the very latest research, consider updating your data sources or specifying your query more broadly.
+- Do NOT use prior knowledge or make up facts. Only use the supplied context.
+- Write clearly and thoroughly, not just a summary.
 Answer:
 """
-        return formatted_context_prompt
+        return prompt
     except Exception as e:
         logging.error(f"Error during context retrieval: {e}", exc_info=True)
         return f"User Query: {query}\n\nRelevant Context:\nError during retrieval: {e}"
@@ -330,6 +344,7 @@ async def get_research_answer(query: str, model: str) -> str:
     if 'vectorstore' not in globals() or vectorstore is None:
         logging.error("Vectorstore is not available. Cannot process query.")
         return "Error: Research index not available. Please check backend startup logs."
+    # Use more context and instruct for detailed answer in the prompt
     rag_prompt_with_context = retrieve_context(query, vectorstore)
     logging.info("Context retrieval step completed.")
     try:

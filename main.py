@@ -9,6 +9,23 @@ from gemini_client import gemini_query
 
 app = FastAPI()
 
+# --- Async ingestion at startup ---
+@app.on_event("startup")
+async def ingest_async_resources():
+    from langchain_community.embeddings import HuggingFaceEmbeddings
+    from langchain_community.vectorstores import FAISS
+    import os
+    from async_ingest import fetch_and_ingest_async_resources
+    global vectorstore
+    faiss_index_path = "faiss_index"
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    # Load or create vectorstore
+    if os.path.exists(faiss_index_path):
+        vectorstore = FAISS.load_local(faiss_index_path, embeddings, allow_dangerous_deserialization=True)
+    else:
+        vectorstore = FAISS.from_documents([], embeddings)
+    await fetch_and_ingest_async_resources(vectorstore)
+
 # --- Health Endpoint ---
 @app.get("/health")
 def health():
