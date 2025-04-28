@@ -4,10 +4,15 @@ transformers
 sentence-transformers
 beautifulsoup4
 requests
+aiohttp
+newspaper3k
+feedparser
 tqdm
 openai
 google-generativeai
 python-dotenv
-lxmlfastapi
+lxml[html_clean]
+lxml_html_clean
+fastapi
 uvicorn
 feedparser

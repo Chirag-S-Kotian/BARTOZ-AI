@@ -2,10 +2,24 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from rag_pipeline import get_research_answer, vectorstore
+from data_sources_config import AI_SOURCES
 from openrouter_client import openrouter_query
 from gemini_client import gemini_query
 
 app = FastAPI()
+
+# --- Health Endpoint ---
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+# --- Sources Endpoint ---
+@app.get("/sources")
+def sources():
+    # List all sources: static and pluggable
+    static_sources = ["arxiv", "pubmed", "ssrn", "ai_companies"]
+    dynamic_sources = [src['name'] for src in AI_SOURCES]
+    return {"static_sources": static_sources, "dynamic_sources": dynamic_sources}
 
 # --- DB Size Endpoint ---
 @app.get("/db_size")

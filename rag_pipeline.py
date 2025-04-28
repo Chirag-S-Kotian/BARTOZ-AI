@@ -1,7 +1,9 @@
 # Assuming necessary imports for your RAG pipeline components
 # Ensure these libraries are installed:
 # pip install langchain-community faiss-cpu sentence-transformers
-from data_loader import fetch_arxiv, fetch_pubmed, fetch_ssrn, fetch_ai_companies # Import fetch_ai_companies for company/agent info
+from data_loader import fetch_arxiv, fetch_pubmed, fetch_ssrn, fetch_ai_companies
+import asyncio
+from async_data_loader import fetch_all_sources
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -115,6 +117,26 @@ try:
             doc = Document(page_content=content, metadata=metadata)
             all_docs.append(doc)
 
+    # Fetch and add async resources from additional sources
+    logging.info("Fetching additional async resources from AI/ML/LLM news/blog/research sources...")
+    try:
+        async_resources = asyncio.run(fetch_all_sources())
+        logging.info(f"Fetched {len(async_resources)} async resources.")
+        for res in async_resources:
+            content = f"Resource Title: {res['title']}\nSource: {res['source']}\nCompany: {res.get('company','')}\nType: {res['type']}\nURL: {res['url']}\nPublished: {res.get('published_date','')}\nSummary: {res.get('summary','')}"
+            # Optionally, could fetch article content and append here
+            metadata = {
+                "source": res['source'],
+                "title": res['title'],
+                "url": res['url'],
+                "company": res.get('company',''),
+                "type": res['type'],
+                "published_date": res.get('published_date','')
+            }
+            all_docs.append(Document(page_content=content, metadata=metadata))
+    except Exception as e:
+        logging.error(f"Error fetching async resources: {e}")
+
     logging.info(f"Created {len(all_docs)} documents.")
 
     logging.info("Splitting documents...")
@@ -159,7 +181,7 @@ except Exception as e:
 
 # --- RAG Retrieval Logic ---
 # This function now uses the vectorstore to find relevant context.
-def retrieve_context(query: str, vectorstore: FAISS, k: int = 12, diversify_sources: bool = True) -> str:
+def retrieve_context(query: str, vectorstore: FAISS, k: int = 12, diversify_sources: bool = True, date_from: str = None, date_to: str = None) -> str:
     """
     Advanced RAG context retrieval: deduplicate, diversify, enrich metadata, allow dynamic k.
     """
@@ -168,7 +190,59 @@ def retrieve_context(query: str, vectorstore: FAISS, k: int = 12, diversify_sour
         return f"User Query: {query}\n\nRelevant Context:\nError: Vectorstore not available."
     try:
         logging.info(f"Performing similarity search for query: {query}")
-        docs: List[Document] = vectorstore.similarity_search(query, k=k*3) # get more for dedup/diversity
+        docs: List[Document] = vectorstore.similarity_search(query, k=k*6) # get more for dedup/diversity
+
+        # --- Temporal Filtering (if requested) ---
+        if date_from or date_to:
+            from datetime import datetime
+            def in_range(doc):
+                date_str = doc.metadata.get('published_date', '')
+                try:
+                    date = datetime.fromisoformat(date_str[:19]) if date_str else None
+                except Exception:
+                    date = None
+                if date_from and date:
+                    if date < datetime.fromisoformat(date_from):
+                        return False
+                if date_to and date:
+                    if date > datetime.fromisoformat(date_to):
+                        return False
+                return True
+            docs = [doc for doc in docs if in_range(doc)]
+
+        # --- Expanded AI-Related Keywords ---
+        global keywords
+        keywords = [
+            'ai', 'artificial intelligence', 'machine learning', 'ml', 'deep learning', 'llm', 'large language model',
+            'agent', 'agents', 'company', 'companies', 'startup', 'foundation', 'research', 'anthropic', 'openai',
+            'google', 'deepmind', 'meta', 'facebook', 'microsoft', 'hugging face', 'stability', 'cohere', 'mistral',
+            'llama', 'gpt', 'gemini', 'palm', 'bard', 'chatgpt', 'crew ai', 'crewai', 'databricks', 'databricks', 'xai', 'elon', 'tesla', 'nvidia', 'stability ai', 'deeplearning.ai', 'the batch', 'the gradient', 'venturebeat', 'arxiv', 'pubmed', 'ssrn', 'research paper', 'blog', 'news', 'newsletter', 'project', 'product', 'ceo', 'funding', 'valuation', 'founder', 'headquarters', 'timeline', 'milestone', 'paper', 'publication', 'release', 'update', 'announcement'
+        ]
+
+        def is_ai_related(text):
+            text_lower = text.lower()
+            return any(kw in text_lower for kw in keywords)
+
+        # --- AI-Related Filtering ---
+        filtered_docs = [doc for doc in docs if is_ai_related(doc.page_content) or is_ai_related(doc.metadata.get('title', ''))]
+
+        # --- Fallback: BM25/Keyword Search if too few results ---
+        if len(filtered_docs) < k:
+            # Simple keyword search fallback (BM25-like): rank all docs by keyword overlap
+            scored = []
+            query_terms = set(query.lower().split())
+            for doc in docs:
+                doc_text = doc.page_content.lower() + ' ' + doc.metadata.get('title', '').lower()
+                score = sum(1 for term in query_terms if term in doc_text)
+                scored.append((score, doc))
+            scored.sort(reverse=True, key=lambda x: x[0])
+            fallback_docs = [doc for score, doc in scored if score > 0][:k]
+            # If still not enough, just take the top-k by dense similarity
+            if len(fallback_docs) < k:
+                fallback_docs = docs[:k]
+            filtered_docs = filtered_docs + [doc for doc in fallback_docs if doc not in filtered_docs]
+        # Always return at least k docs
+        filtered_docs = filtered_docs[:k]
         logging.info(f"Found {len(docs)} relevant documents before dedup/diversity.")
 
         # Deduplicate by title+source
