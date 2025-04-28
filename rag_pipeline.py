@@ -118,13 +118,13 @@ try:
             all_docs.append(doc)
 
     # Fetch and add async resources from additional sources
+    # To increase document count, raise max_docs below (e.g., 2000, 5000)
     logging.info("Fetching additional async resources from AI/ML/LLM news/blog/research sources...")
     try:
-        async_resources = asyncio.run(fetch_all_sources())
-        logging.info(f"Fetched {len(async_resources)} async resources.")
+        async_resources = asyncio.run(fetch_all_sources(max_docs=1200))
+        logging.info(f"Fetched {len(async_resources)} async resources (news/blog/research).")
         for res in async_resources:
             content = f"Resource Title: {res['title']}\nSource: {res['source']}\nCompany: {res.get('company','')}\nType: {res['type']}\nURL: {res['url']}\nPublished: {res.get('published_date','')}\nSummary: {res.get('summary','')}\n\nFull Content: {res.get('content', '')}"
-            # Optionally, could fetch article content and append here
             metadata = {
                 "source": res['source'],
                 "title": res['title'],
@@ -134,6 +134,7 @@ try:
                 "published_date": res.get('published_date','')
             }
             all_docs.append(Document(page_content=content, metadata=metadata))
+        logging.info(f"Total documents after async ingestion: {len(all_docs)}")
     except Exception as e:
         logging.error(f"Error fetching async resources: {e}")
 

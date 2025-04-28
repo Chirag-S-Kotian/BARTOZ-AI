@@ -113,34 +113,34 @@ Answer:"""
         # --- Handle cases where no text was generated ---
         if not result:
             logging.warning("Gemini API generated an empty response.")
-            # Try to get finish reason from the last chunk or the response object
             finish_reason = "Unknown"
             safety_ratings = "N/A"
-
-            # Access finish_reason and safety_ratings from the response object if possible
             if isinstance(stream_response, GenerateContentResponse) and stream_response.candidates:
-                 try:
-                     # Get finish reason from the first candidate
-                     finish_reason = stream_response.candidates[0].finish_reason.name
-                     logging.warning(f"Gemini finish reason: {finish_reason}")
-
-                     # Get safety ratings from the first candidate
-                     if stream_response.candidates[0].safety_ratings:
-                          safety_ratings = ", ".join([
-                              f"{sr.category.name}: {sr.probability.name}"
-                              for sr in stream_response.candidates[0].safety_ratings
-                          ])
-                          logging.warning(f"Gemini safety ratings: {safety_ratings}")
-
-                 except Exception as e:
-                     logging.warning(f"Could not get finish reason or safety ratings from response object: {e}")
-
-            # Provide a user-friendly message indicating why the response might be empty
-            return (f"Gemini API generated no content. This could be due to safety filters, "
-                    f"irrelevant context, or model limitations. "
+                try:
+                    finish_reason = stream_response.candidates[0].finish_reason.name
+                    logging.warning(f"Gemini finish reason: {finish_reason}")
+                    if stream_response.candidates[0].safety_ratings:
+                        safety_ratings = ", ".join([
+                            f"{sr.category.name}: {sr.probability.name}"
+                            for sr in stream_response.candidates[0].safety_ratings
+                        ])
+                        logging.warning(f"Gemini safety ratings: {safety_ratings}")
+                except Exception as e:
+                    logging.warning(f"Could not get finish reason or safety ratings from response object: {e}")
+            # User-friendly error message
+            return (f"❌ Gemini API generated no content. This may be due to safety filters, irrelevant context, or model limitations. "
                     f"Finish Reason: {finish_reason}. Safety Ratings: {safety_ratings}")
         # --- End handling empty response ---
 
+        # If finish_reason is not STOP, warn user
+        if isinstance(stream_response, GenerateContentResponse) and stream_response.candidates:
+            try:
+                finish_reason = stream_response.candidates[0].finish_reason.name
+                if finish_reason != 'STOP':
+                    logging.warning(f"Gemini did not finish normally: {finish_reason}")
+                    return f"❌ Gemini did not finish normally. Finish Reason: {finish_reason}"
+            except Exception:
+                pass
 
         return result
 

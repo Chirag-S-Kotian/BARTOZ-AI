@@ -1,4 +1,11 @@
-# BARTOZ-AI: Open Source AI/ML/LLM Research Assistant
+# BARTOZ-AI: Open Source AI/LLM/Agent Research Assistant
+
+![GitHub](https://img.shields.io/badge/GitHub-BARTOZ--AI-181717?logo=github) ![Open Source](https://img.shields.io/badge/Open%20Source-Yes-brightgreen) ![Stars](https://img.shields.io/github/stars/Chirag-S-Kotian/BARTOZ-AI?style=social)
+
+---
+
+BARTOZ-AI is a modern, open-source Retrieval-Augmented Generation (RAG) system focused on AI, LLMs, agents, and major AI companies. It combines scalable async ingestion (1000+ docs), robust deduplication, and a beautiful Streamlit UI, powered by Gemini and DeepSeek models. Always up-to-date, always cited.
+
 
 [![GitHub Repo](https://img.shields.io/badge/GitHub-BARTOZ--AI-181717?logo=github)](https://github.com/Chirag-S-Kotian/BARTOZ-AI)
 [![Open Source](https://img.shields.io/badge/Open%20Source-Yes-brightgreen)](https://github.com/Chirag-S-Kotian/BARTOZ-AI)
@@ -6,7 +13,18 @@
 
 ---
 
-## 🚦 Installation & Getting Started
+## 🚀 Features
+- **Async Data Loader**: Ingests 1000+ docs from arXiv, company blogs, news, and more (see `data_sources_config.py`).
+- **Modern RAG Pipeline**: Unified context for Gemini & DeepSeek; scalable vectorstore (FAISS).
+- **Beautiful Streamlit UI**: Responsive, theme toggle, live model health, database preview.
+- **Extensible Sources**: Add any RSS/news/blog/research feed in `data_sources_config.py`.
+- **Automated Scheduler**: (Optional) Schedule daily/weekly re-indexing with `scheduler.py`.
+- **FastAPI Backend**: Robust API for querying, health, preview, and source listing.
+- **Open Source & Easy to Extend**: Add new models, sources, or UI features easily.
+
+---
+
+## ⚡ Quickstart
 
 1. **Clone the repo:**
    ```bash
@@ -71,7 +89,34 @@ It combines Retrieval-Augmented Generation (RAG) with Gemini and DeepSeek models
 
 ---
 
-## 🖼️ Diagram: How BARTOZ-AI Works
+## 🏗️ Architecture Overview
+
+```
+[ User (Streamlit UI) ]
+         |
+         v
+[ FastAPI Backend ]
+         |
+         v
+[ RAG Pipeline: async_data_loader.py + rag_pipeline.py ]
+         |
+         v
+[ FAISS Vectorstore ]
+         |
+         v
+[ Gemini / DeepSeek Model ]
+         |
+         v
+[ Answer + Sources ]
+```
+
+**Key Components:**
+- `async_data_loader.py`: Async ingestion, deduplication, scalable document fetching
+- `rag_pipeline.py`: Indexing, context building, vectorstore management
+- `frontend/app.py`: Streamlit UI (theme toggle, health check, preview, query)
+- `main.py`: FastAPI backend (API endpoints)
+- `gemini_client.py`, `openrouter_client.py`: Model adapters
+- `data_sources_config.py`: All news/blog/company/research sources
 
 ```
 [ User Query ]
@@ -128,7 +173,44 @@ pip install -r requirements.txt
 
 ---
 
-## ⚡ Usage
+## 🛠️ Setup & Usage
+
+1. **Clone and Install**
+   ```bash
+   git clone https://github.com/Chirag-S-Kotian/BARTOZ-AI.git
+   cd BARTOZ-AI
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   ```
+2. **Set API Keys**
+   - Create `.env` in project root:
+     ```
+     OPENROUTER_API_KEY=your-openrouter-key
+     GEMINI_API_KEY=your-gemini-key
+     ```
+3. **Ingest & Index**
+   ```bash
+   python rag_pipeline.py
+   # (Optional: schedule with python scheduler.py)
+   ```
+4. **Start Backend**
+   ```bash
+   uvicorn main:app --reload --port 8000
+   ```
+5. **Launch Frontend**
+   ```bash
+   streamlit run frontend/app.py
+   ```
+
+---
+
+## 💡 Advanced Usage
+- **Increase document coverage:** Edit `max_docs` in `fetch_all_sources()` in `rag_pipeline.py` or add more sources in `data_sources_config.py`.
+- **Add new models:** Extend `gemini_client.py` or `openrouter_client.py`.
+- **Automate ingestion:** Use `scheduler.py` to set up regular re-indexing.
+- **API Endpoints:** See `main.py` for `/query`, `/model_health`, `/db_size`, `/docs_preview`, `/sources`.
+
 
 ### 1. Run the Ingestion Pipeline
 ```bash
@@ -160,7 +242,25 @@ print(asyncio.run(query_gemini("Who are the leading AI agents in 2025?")))
 
 ---
 
-## 📂 Folder Structure
+## 📂 Project Structure
+
+```
+bartoz-ai/
+├── async_data_loader.py   # Async fetch, deduplication, scalable ingestion
+├── data_loader.py        # Company/agent/LLM metadata
+├── rag_pipeline.py       # Indexing, context, embeddings, FAISS
+├── data_sources_config.py# All RSS/news/blog sources
+├── main.py               # FastAPI backend
+├── frontend/
+│   └── app.py            # Streamlit UI
+├── gemini_client.py      # Gemini API client
+├── openrouter_client.py  # DeepSeek/OpenRouter API client
+├── requirements.txt
+├── scheduler.py          # (Optional) Automated re-indexing
+├── .env                  # API keys
+├── faiss_index/          # Vectorstore
+└── README.md
+```
 ```
 bartoz-ai/
 ├── data_loader.py
@@ -182,13 +282,29 @@ bartoz-ai/
 ---
 
 ## 🤝 Contributing
+- Star ⭐ the repo and open issues/PRs for bugs, features, or new sources
+- Suggest new sources or models (see `data_sources_config.py`)
+- All contributions welcome!
+
 - Star the repo ⭐ and open issues/PRs for features or bugfixes
 - Suggest new sources or models
 - All contributions welcome!
 
 ---
 
-## 🙋 FAQ
+## 🧩 Troubleshooting & FAQ
+
+- **Q: Streamlit duplicate key error?**
+  - Ensure every `st.button` or widget in `app.py` uses a unique `key` (especially in the sidebar).
+- **Q: How do I add more sources?**
+  - Add new dicts to `AI_SOURCES` in `data_sources_config.py`.
+- **Q: How fresh is the data?**
+  - Data is refreshed every time you run `rag_pipeline.py` (or via `scheduler.py`).
+- **Q: Can I use my own LLM?**
+  - Yes! Add your API adapter and plug into the pipeline.
+- **Q: How do I cite sources in answers?**
+  - All answers are cited with titles and URLs from the ingested context.
+
 - **Q: What questions does BARTOZ-AI answer?**
   - Only questions about AI, ML, LLMs, AI agents, or major AI companies/labs.
 - **Q: How fresh is the info?**
@@ -198,7 +314,12 @@ bartoz-ai/
 
 ---
 
-## 📣 License
+## 📄 License
+MIT License. See [LICENSE](LICENSE) for details.
+
+---
+
+**Made with ❤️ by [Chirag S Kotian](https://github.com/Chirag-S-Kotian) — [Star us on GitHub!](https://github.com/Chirag-S-Kotian/BARTOZ-AI)**
 MIT License. See [LICENSE](LICENSE) for details.
 
 ---
