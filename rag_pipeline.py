@@ -181,7 +181,7 @@ except Exception as e:
 
 # --- RAG Retrieval Logic ---
 # This function now uses the vectorstore to find relevant context.
-def retrieve_context(query: str, vectorstore: FAISS, k: int = 12, diversify_sources: bool = True, date_from: str = None, date_to: str = None) -> str:
+def retrieve_context(query: str, vectorstore: FAISS, k: int = 2, diversify_sources: bool = True, date_from: str = None, date_to: str = None) -> str:
     """
     Advanced RAG context retrieval: deduplicate, diversify, enrich metadata, allow dynamic k.
     """
@@ -214,9 +214,10 @@ def retrieve_context(query: str, vectorstore: FAISS, k: int = 12, diversify_sour
         global keywords
         keywords = [
             'ai', 'artificial intelligence', 'machine learning', 'ml', 'deep learning', 'llm', 'large language model',
-            'agent', 'agents', 'company', 'companies', 'startup', 'foundation', 'research', 'anthropic', 'openai',
+            'agent', 'agents', 'autonomous', 'autonomy', 'company', 'companies', 'startup', 'foundation', 'research', 'anthropic', 'openai',
             'google', 'deepmind', 'meta', 'facebook', 'microsoft', 'hugging face', 'stability', 'cohere', 'mistral',
-            'llama', 'gpt', 'gemini', 'palm', 'bard', 'chatgpt', 'crew ai', 'crewai', 'databricks', 'databricks', 'xai', 'elon', 'tesla', 'nvidia', 'stability ai', 'deeplearning.ai', 'the batch', 'the gradient', 'venturebeat', 'arxiv', 'pubmed', 'ssrn', 'research paper', 'blog', 'news', 'newsletter', 'project', 'product', 'ceo', 'funding', 'valuation', 'founder', 'headquarters', 'timeline', 'milestone', 'paper', 'publication', 'release', 'update', 'announcement'
+            'llama', 'gpt', 'gemini', 'palm', 'bard', 'chatgpt', 'crew ai', 'crewai', 'databricks', 'databricks', 'xai', 'elon', 'tesla', 'nvidia', 'stability ai', 'deeplearning.ai', 'the batch', 'the gradient', 'venturebeat', 'arxiv', 'pubmed', 'ssrn', 'research paper', 'blog', 'news', 'newsletter', 'project', 'product', 'ceo', 'funding', 'valuation', 'founder', 'headquarters', 'timeline', 'milestone', 'paper', 'publication', 'release', 'update', 'announcement',
+            'ai agent', 'ai agents', 'llm', 'llms', 'foundation model', 'foundation models', 'transformer', 'transformers', 'neural network', 'neural networks', 'language model', 'language models', 'sora', 'video generation', 'text to video', 'text to image', 'diffusion', 'stable diffusion', 'clip', 'dalle', 'midjourney', 'perplexity', 'phi', 'orca', 'wizardlm', 'vicuna', 'alpaca', 'falcon', 'mpt', 'bloom', 'grok', 'xai', 'leela', 'reka', 'llamaindex', 'langchain', 'prompt', 'prompt engineering', 'retrieval', 'rag', 'retrieval augmented generation', 'inference', 'fine-tuning', 'finetune', 'finetuning', 'open source ai', 'open source llm', 'api', 'cloud ai', 'api.ai', 'agents', 'autogen', 'autogenstudio', 'agentic', 'agentic ai', 'agent framework', 'agent frameworks', 'agentic workflow', 'agentic workflows', 'ai platform', 'ai platforms', 'ai ecosystem', 'ai stack', 'ai system', 'ai systems', 'ai research', 'ai safety', 'alignment', 'capabilities', 'benchmarks', 'leaderboard', 'eval', 'evaluation', 'metrics', 'hallucination', 'citation', 'chain of thought', 'cot', 'reasoning', 'multimodal', 'multimodality', 'vision', 'audio', 'speech', 'speech to text', 'text to speech', 'tts', 'stt', 'voice', 'voice ai', 'embeddings', 'embedding', 'vector', 'vector search', 'vector db', 'qdrant', 'weaviate', 'milvus', 'pinecone', 'faiss', 'chromadb', 'vectara', 'haystack', 'haystack ai', 'semantic', 'semantic search', 'semantic retrieval', 'dense retrieval', 'sparse retrieval', 'bm25', 'hybrid retrieval', 'hybrid search', 'hybrid rag', 'hybrid model', 'hybrid pipeline', 'hybrid agent', 'hybrid workflow', 'hybrid system', 'hybrid architecture', 'hybrid approach', 'hybrid framework', 'hybrid platform', 'hybrid ecosystem', 'hybrid stack', 'hybrid system', 'hybrid ai', 'hybrid llm', 'hybrid agent', 'hybrid agentic', 'hybrid agentic ai', 'hybrid agentic workflow', 'hybrid agentic system', 'hybrid agentic platform', 'hybrid agentic ecosystem', 'hybrid agentic stack', 'hybrid agentic system', 'hybrid agentic ai', 'hybrid agentic llm', 'hybrid agentic agent', 'hybrid agentic agentic', 'hybrid agentic agentic ai', 'hybrid agentic agentic workflow', 'hybrid agentic agentic system', 'hybrid agentic agentic platform', 'hybrid agentic agentic ecosystem', 'hybrid agentic agentic stack', 'hybrid agentic agentic system', 'hybrid agentic agentic ai', 'hybrid agentic agentic llm', 'hybrid agentic agentic agent', 'hybrid agentic agentic agentic', 'hybrid agentic agentic agentic ai', 'hybrid agentic agentic agentic workflow', 'hybrid agentic agentic agentic system', 'hybrid agentic agentic agentic platform', 'hybrid agentic agentic agentic ecosystem', 'hybrid agentic agentic agentic stack', 'hybrid agentic agentic agentic system', 'hybrid agentic agentic agentic ai', 'hybrid agentic agentic agentic llm', 'hybrid agentic agentic agentic agent', 'hybrid agentic agentic agentic agentic', 'hybrid agentic agentic agentic agentic ai', 'hybrid agentic agentic agentic agentic workflow', 'hybrid agentic agentic agentic agentic system', 'hybrid agentic agentic agentic agentic platform', 'hybrid agentic agentic agentic agentic ecosystem', 'hybrid agentic agentic agentic agentic stack', 'hybrid agentic agentic agentic agentic system', 'hybrid agentic agentic agentic agentic ai', 'hybrid agentic agentic agentic agentic llm', 'hybrid agentic agentic agentic agentic agent'
         ]
 
         def is_ai_related(text):
@@ -225,6 +226,7 @@ def retrieve_context(query: str, vectorstore: FAISS, k: int = 12, diversify_sour
 
         # --- AI-Related Filtering ---
         filtered_docs = [doc for doc in docs if is_ai_related(doc.page_content) or is_ai_related(doc.metadata.get('title', ''))]
+        logging.info(f"AI-related docs found: {len(filtered_docs)} / {len(docs)} for query: '{query}'")
 
         # --- Fallback: BM25/Keyword Search if too few results ---
         if len(filtered_docs) < k:
@@ -243,6 +245,10 @@ def retrieve_context(query: str, vectorstore: FAISS, k: int = 12, diversify_sour
             filtered_docs = filtered_docs + [doc for doc in fallback_docs if doc not in filtered_docs]
         # Always return at least k docs
         filtered_docs = filtered_docs[:k]
+        # Fallback: if still empty, return the top k most recent docs
+        if not filtered_docs:
+            docs_sorted = sorted(docs, key=lambda d: d.metadata.get('published_date', ''), reverse=True)
+            filtered_docs = docs_sorted[:k]
         logging.info(f"Found {len(docs)} relevant documents before dedup/diversity.")
 
         # Deduplicate by title+source
@@ -331,6 +337,7 @@ def retrieve_context(query: str, vectorstore: FAISS, k: int = 12, diversify_sour
         formatted_context_prompt = f"""
 You are an expert AI/ML/LLM research assistant.
 STRICT INSTRUCTIONS:
+- Provide a brief, focused summary (3–5 sentences, only essential facts).
 - ONLY answer using the information provided in the context below.
 - If the answer is not found in the context, reply: 'Sorry, the answer was not found in the provided research context.'
 - Do NOT use prior knowledge or make up answers.

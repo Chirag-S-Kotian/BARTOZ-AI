@@ -22,19 +22,14 @@ def openrouter_query(prompt: str) -> str:
     try:
         # Create a chat completion request
         response = client.chat.completions.create(
-            # Corrected model ID for DeepSeek chat on OpenRouter
-            model="deepseek/deepseek-chat", # Using the potentially correct model ID
-            messages=[{"role": "user", "content": prompt}], # User message
+            model="deepseek/deepseek-chat",
+            messages=[{"role": "user", "content": prompt}],
             extra_headers={
-                "HTTP-Referer": "https://yourdomain.com", # Replace with your domain
-                "X-Title": "AI Research Assistant" # Title for logging purposes
+                "HTTP-Referer": "https://yourdomain.com",
+                "X-Title": "AI Research Assistant"
             }
         )
-        # Extract and return the model's response
         return response.choices[0].message.content
     except Exception as e:
-        # Log the specific error for debugging
         print(f"Error in openrouter_query: {e}")
-        # Re-raise the exception or return an error message
-        raise # Re-raising to be caught by the FastAPI error handler
-        # return f"Error querying OpenRouter (DeepSeek): {e}" # Alternative: return error message
+        return f"Error querying OpenRouter (DeepSeek): {e}"

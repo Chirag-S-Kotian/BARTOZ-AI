@@ -3,17 +3,78 @@ import requests
 import re
 
 # --- Page Config & Sidebar ---
-st.set_page_config(page_title="AI Research Assistant", page_icon="🧠", layout="centered")
+st.set_page_config(page_title="AI Research Assistant", page_icon="🧠", layout="wide")
+
+# --- Theme Toggle ---
+if 'theme' not in st.session_state:
+    st.session_state['theme'] = 'light'
+
+col1, col2 = st.columns([8,1])
+with col2:
+    if st.button('🌙' if st.session_state['theme']=='light' else '☀️', key='theme_toggle'):
+        st.session_state['theme'] = 'dark' if st.session_state['theme']=='light' else 'light'
+
+if st.session_state['theme'] == 'dark':
+    st.markdown("""
+        <style>
+        body, .stApp {background: #18181b !important; color: #e5e7eb !important;}
+        .bartoz-title, .bartoz-desc, .bartoz-author {color: #e5e7eb !important;}
+        .card {background: #23272f !important; color: #e5e7eb !important;}
+        .sample-query-btn {background: linear-gradient(90deg,#818cf8 0%,#38bdf8 100%) !important; color: #fff;}
+        </style>
+    """, unsafe_allow_html=True)
+else:
+    st.markdown("""
+        <style>
+        body, .stApp {background: linear-gradient(120deg, #e0e7ff 0%, #f0f8ff 100%) !important;}
+        .card {background: #fff !important; color: #222 !important;}
+        </style>
+    """, unsafe_allow_html=True)
 
 # Sidebar: About, Tips, Features, Open Source
 with st.sidebar:
     st.image("https://img.icons8.com/ios-filled/100/000000/artificial-intelligence.png", width=60)
     # --- RAG DB Size ---
     try:
-        db_size = requests.get("http://localhost:8000/db_size", timeout=2).json().get("size", "-")
-        st.markdown(f"**📦 RAG DB Size:** {db_size} chunks")
+        db_size_resp = requests.get("http://localhost:8000/db_size", timeout=2)
+        db_size = db_size_resp.json().get("size", "-")
+        if db_size == 0:
+            st.warning("RAG DB Size: 0 chunks (database may be empty or not loaded, try refreshing or re-indexing)")
+        else:
+            st.markdown(f"**📦 RAG DB Size:** {db_size} chunks")
     except Exception:
         st.markdown("**📦 RAG DB Size:** - (unavailable)")
+    # --- Model Health Check ---
+    if st.button("🩺 Check Model Health"):
+        try:
+            health = requests.get("http://localhost:8000/model_health", timeout=4).json()
+            gemini = health.get("gemini", {})
+            openrouter = health.get("openrouter", {})
+            st.markdown(f"<b>Gemini Model:</b> <span style='color:{'green' if gemini.get('status')=='ok' else 'red'}'>{gemini.get('status','unknown')}</span> - {gemini.get('error','')}", unsafe_allow_html=True)
+            st.markdown(f"<b>OpenRouter Model:</b> <span style='color:{'green' if openrouter.get('status')=='ok' else 'red'}'>{openrouter.get('status','unknown')}</span> - {openrouter.get('error','')}", unsafe_allow_html=True)
+        except Exception as e:
+            st.error(f"Could not check model health: {e}")
+    st.info("No previous data is ever deleted during indexing or querying. All documents are preserved unless you manually delete the faiss_index directory.")
+    # --- Database Preview ---
+    if st.button("🔍 Preview Database (first 10 docs)"):
+        try:
+            preview_resp = requests.get("http://localhost:8000/docs_preview", timeout=4)
+            preview = preview_resp.json().get("preview", [])
+            if preview:
+                st.markdown("<b>Database Preview (first 10 docs):</b>", unsafe_allow_html=True)
+                for doc in preview:
+                    st.markdown(f"""
+                    <div class='card' style='margin-bottom:18px;padding:14px 14px 10px 14px;border-radius:8px;border:1px solid #c7d2fe;'>
+                      <b>{doc['title']}</b><br>
+                      <span style='color:#6366f1;font-size:0.97rem;'>{doc['source']} | {doc['published_date']}</span><br>
+                      <span style='font-size:0.98rem;'>{doc['summary']}</span><br>
+                      <a href='{doc['url']}' style='font-size:0.93rem;'>{doc['url']}</a>
+                    </div>
+                    """, unsafe_allow_html=True)
+            else:
+                st.info("No documents found in the database.")
+        except Exception as e:
+            st.warning(f"Could not fetch database preview: {e}")
     st.markdown("""
     # 🤖 About
     **BARTOZ-AI: Open Source AI Research Assistant**
@@ -189,10 +250,14 @@ if submitted:
                 else:
                     main_answer = answer.strip()
                 # --- Show main answer ---
-                st.markdown("""
-                <div style='background:linear-gradient(90deg,#e0e7ff 0%,#f0f8ff 100%);padding:24px 20px;border-radius:10px;border:1px solid #c7d2fe;margin-bottom:24px;color:#222;font-size:1.15rem;'>
-                <b>🧠 Answer</b><br><br>{}</div>
-                """.format(main_answer), unsafe_allow_html=True)
+                # Modern answer card
+                st.markdown(f"""
+                <div class='card' style='box-shadow:0 2px 12px #c7d2fe55;padding:28px 22px 22px 22px;border-radius:14px;border:1.5px solid #818cf8;margin-bottom:30px;max-width:750px;'>
+                  <div style='font-size:1.15rem;font-weight:700;color:#6366f1;margin-bottom:0.3em;'>🧠 AI Research Answer</div>
+                  <div style='font-size:1.14rem;line-height:1.7;'>{main_answer}</div>
+                  <div style='font-size:0.96rem;color:#666;margin-top:0.8em;'>No previous data is ever deleted during indexing or querying. All documents are preserved unless you manually delete the faiss_index directory.</div>
+                </div>
+                """, unsafe_allow_html=True)
                 # --- Show context/docs ---
                 if context_match:
                     context = context_match.group(1).strip()
