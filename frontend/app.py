@@ -474,7 +474,7 @@ st.markdown("""
     <a href='#features'>Features</a> |
     <a href='https://github.com/Chirag-S-Kotian/BARTOZ-AI' target='_blank'>GitHub</a> |
     <a href='https://github.com/Chirag-S-Kotian/BARTOZ-AI#docs' target='_blank'>Docs</a> |
-    <a href='mailto:chiragskotian@gmail.com'>Contact</a>
+    <a href='mailto:kotianchinnu99@gmail.com'>Contact</a>
   </div>
   <div class='bartoz-footer-badges'>
     <img src='https://img.shields.io/github/stars/Chirag-S-Kotian/BARTOZ-AI?style=social' alt='GitHub stars' style='vertical-align:middle; margin-right:0.7em;'/>
