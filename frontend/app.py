@@ -1,6 +1,13 @@
 import streamlit as st
 import requests
 import re
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Get backend URL from environment or default to localhost
+BACKEND_URL = os.getenv('BACKEND_URL', 'http://localhost:8000')
 
 st.set_page_config(page_title="AI Research Assistant", page_icon="", layout="wide")
 
@@ -408,7 +415,7 @@ if submitted:
         with st.spinner("Thinking..."):
             try:
                 response = requests.post(
-                    "http://localhost:8000/query",
+                    f"{BACKEND_URL}/query",
                     json={"query": query, "model": model_name}
                 )
                 response.raise_for_status()
