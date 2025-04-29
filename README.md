@@ -2,7 +2,28 @@
   <img src="https://raw.githubusercontent.com/Chirag-S-Kotian/BARTOZ-AI/main/.github/assets/animated-neural-net.svg" alt="Animated Neural Network" width="600"/>
 </p>
 
-# 🧠 BARTOZ-AI: Open Source AI/LLM/Agent Research Assistant
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Chirag-S-Kotian/BARTOZ-AI/main/.github/assets/animated-neural-net.svg" alt="Animated Neural Network" width="600"/>
+</p>
+
+<h1 align="center">🚀 BARTOZ-AI: The Ultimate Open Source AI/LLM/Agent Research Assistant</h1>
+
+<p align="center">
+  <img alt="GitHub stars" src="https://img.shields.io/github/stars/Chirag-S-Kotian/BARTOZ-AI?style=social">
+  <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg">
+  <img alt="Python Version" src="https://img.shields.io/badge/python-3.9%2B-blue">
+  <img alt="LangChain" src="https://img.shields.io/badge/Made%20with-LangChain-4B275F?logo=langchain">
+  <img alt="Streamlit" src="https://img.shields.io/badge/UI-Streamlit-FF4B4B?logo=streamlit">
+  <img alt="Gemini" src="https://img.shields.io/badge/LLM-Gemini-4285F4?logo=google">
+  <img alt="DeepSeek" src="https://img.shields.io/badge/LLM-DeepSeek-00897B">
+  <img alt="Async" src="https://img.shields.io/badge/Async-Enabled-8BC34A">
+</p>
+
+---
+
+> **BARTOZ-AI** is not just another chatbot. It's a next-generation, open-source RAG (Retrieval-Augmented Generation) platform built for AI/ML/LLM/Agent research at scale. Designed for engineers, researchers, and innovators who demand transparency, extensibility, and state-of-the-art answers with sources. 
+
+---
 
 <p align="center">
   <a href="https://github.com/Chirag-S-Kotian/BARTOZ-AI">
@@ -28,18 +49,19 @@
 ---
 
 ## 📚 Table of Contents
-
-- [Why BARTOZ-AI?](#-why-bartoz-ai)
-- [Features](#-features)
-- [Quickstart](#-quickstart)
-- [Architecture Overview](#-architecture-overview)
-- [Project Structure](#-project-structure)
-- [Setup & Usage](#-setup--usage)
-- [Demo Commands](#-demo-commands)
-- [Advanced Usage](#-advanced-usage)
-- [Troubleshooting & FAQ](#-troubleshooting--faq)
-- [Contributing](#-contributing)
-- [License](#-license)
+- [Why BARTOZ-AI?](#why-bartoz-ai)
+- [Features](#features)
+- [Quickstart](#quickstart)
+- [Architecture](#architecture)
+- [Deployment (Render & Local)](#deployment-render--local)
+- [Environment Variables](#environment-variables)
+- [API Reference](#api-reference)
+- [Advanced Usage & Tips](#advanced-usage--tips)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [License](#license)
+- [Roadmap](#roadmap)
+- [Credits](#credits)
 
 ---
 
@@ -66,19 +88,16 @@
 <details open>
 <summary>🚀 <strong>Features</strong></summary>
 
-> <img src="https://img.shields.io/badge/-AI%20Research%20Assistant-blueviolet?style=flat-square&logo=ai" align="left" />
-> 
-> <b>BARTOZ-AI</b> offers a modern async RAG pipeline, beautiful UI, and up-to-date, source-cited answers about AI, LLMs, agents, and companies. 
-> 
-> <span style="color:#43a047;"><b>✨ Scalable, extensible, and open source.</b></span>
-
-- **Async Data Loader**: Ingests 1000+ docs from arXiv, company blogs, news, and more (see `data_sources_config.py`).
-- **Modern RAG Pipeline**: Unified context for Gemini & DeepSeek; scalable vectorstore (FAISS).
-- **Beautiful Streamlit UI**: Responsive, theme toggle, live model health, database preview.
+- **Async Data Ingestion**: Ingest 1000+ docs from arXiv, blogs, news, and more with blazing speed (see `async_data_loader.py`, `data_sources_config.py`).
+- **RAG Pipeline**: Unified, scalable, and context-rich for Gemini & DeepSeek (see `rag_pipeline.py`).
+- **Modern Streamlit UI**: Responsive, theme toggle, live health, database preview (`frontend/app.py`).
 - **Extensible Sources**: Add any RSS/news/blog/research feed in `data_sources_config.py`.
-- **Automated Scheduler**: (Optional) Schedule daily/weekly re-indexing with `scheduler.py`.
-- **FastAPI Backend**: Robust API for querying, health, preview, and source listing.
-- **Open Source & Easy to Extend**: Add new models, sources, or UI features easily.
+- **Automated Scheduler**: Schedule daily/weekly re-indexing (`scheduler.py`).
+- **FastAPI Backend**: Robust API for querying, health, preview, and source listing (`main.py`).
+- **Open Source, Modular, and Beautiful**: Add new models, sources, or UI features with ease.
+- **Production-Ready**: Designed for seamless deployment (Render, local, cloud).
+
+---
 
 </details>
 
@@ -101,8 +120,8 @@ GEMINI_API_KEY=your-gemini-key
 # 3. Ingest & Index
 $ python rag_pipeline.py
 
-# 4. Start Backend
-$ uvicorn main:app --reload --port 8000
+# 4. Start Backend (Local)
+$ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
 # 5. Launch Frontend
 $ streamlit run frontend/app.py
@@ -113,7 +132,27 @@ $ streamlit run frontend/app.py
 ---
 
 <details>
-<summary>🏗️ <strong>Architecture Overview</strong></summary>
+<summary>🏗️ <strong>Architecture</strong></summary>
+
+```mermaid
+graph TD;
+    A[User (Streamlit UI)] --> B[FastAPI Backend];
+    B --> C[RAG Pipeline: async_data_loader.py + rag_pipeline.py];
+    C --> D[FAISS Vectorstore];
+    D --> E[Gemini / DeepSeek Model];
+    E --> F[Answer + Sources];
+```
+
+**Key Components:**
+- `async_data_loader.py`: Async ingestion, deduplication, scalable document fetching
+- `rag_pipeline.py`: Indexing, context building, vectorstore management
+- `frontend/app.py`: Streamlit UI (theme toggle, health check, preview, query)
+- `main.py`: FastAPI backend (API endpoints)
+- `gemini_client.py`, `openrouter_client.py`: Model adapters
+- `data_sources_config.py`: All news/blog/company/research sources
+
+---
+</strong></summary>
 
 ```
 [ User (Streamlit UI) ]
@@ -129,82 +168,29 @@ $ streamlit run frontend/app.py
 [ Answer + Sources ]
 ```
 
-**Key Components:**
-- `async_data_loader.py`: Async ingestion, deduplication, scalable document fetching
-- `rag_pipeline.py`: Indexing, context building, vectorstore management
-- `frontend/app.py`: Streamlit UI (theme toggle, health check, preview, query)
-- `main.py`: FastAPI backend (API endpoints)
-- `gemini_client.py`, `openrouter_client.py`: Model adapters
-- `data_sources_config.py`: All news/blog/company/research sources
-
-```
-[ User Query ]
-      |
-      v
-[ Streamlit UI ]
-      |
-      v
-[ FastAPI Backend ]
-      |
-      v
-[ RAG Pipeline ]
-      |
-      +--> [ Vectorstore (FAISS) ]
-      |        ^
-      |        |
-      |   [ Data Loader: arXiv, PubMed, SSRN, OpenAI, DeepMind, ... ]
-      |
-      v
-[ Gemini or DeepSeek Model ]
-      |
-      v
-[ Answer + Sources ]
-```
-
 </details>
-
----
-
-## 🏢 Example Companies & Labs (auto-enriched)
-
-| Name           | Founded | Founders                       | Headquarters        | Website                      | Latest Blog Title                |
-|----------------|---------|-------------------------------|---------------------|------------------------------|----------------------------------|
-| OpenAI         | 2015    | S. Altman, E. Musk, et al.    | San Francisco, USA  | https://openai.com           | (auto-fetched)                   |
-| DeepMind       | 2010    | D. Hassabis, S. Legg, M. Suleyman | London, UK     | https://deepmind.com         | (auto-fetched)                   |
-| Anthropic      | 2021    | D. Amodei, D. Amodei, et al.  | San Francisco, USA  | https://www.anthropic.com    | (auto-fetched)                   |
-| Cohere         | 2019    | A. Gomez, I. Zhang, et al.    | Toronto, Canada     | https://cohere.com           | (auto-fetched)                   |
-| Hugging Face   | 2016    | C. Delangue, J. Chaumond, T. Wolf | New York, USA  | https://huggingface.co       | (auto-fetched)                   |
-| Stability AI   | 2020    | E. Mostaque                   | London, UK          | https://stability.ai         | (auto-fetched)                   |
-| Google Research| 2006    | Google Inc.                   | Mountain View, USA  | https://research.google      | (auto-fetched)                   |
-| Microsoft Research| 1991 | B. Gates                      | Redmond, USA        | https://microsoft.com/research| (auto-fetched)                 |
-
----
-
-## ✨ Features
-- **Unified RAG pipeline:** Consistent context for Gemini & DeepSeek
-- **Strict topic focus:** Only AI/ML/LLM/Agents/Companies
-- **Live sources:** OpenAI, DeepMind, Anthropic, Cohere, Hugging Face, Stability, arXiv, PubMed, SSRN, The Batch, and more
-- **Company/LLM metadata:** Founders, HQ, year, website, latest blog, and more
-- **Modern Streamlit UI:** Beautiful landing page, GitHub star button, open source branding
-- **Automated daily re-indexing**
-- **Easy to extend**: Add new models, sources, or UI features easily.
 
 ---
 
 <details>
-<summary>🛠️ <strong>Setup</strong></summary>
+<summary>🛠️ <strong>Deployment (Render & Local)</strong></summary>
 
-```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
+### Local Development
+- Backend:  
+  `uvicorn main:app --host 0.0.0.0 --port 8000 --reload`
+- Frontend:  
+  `streamlit run frontend/app.py`
 
-- Set your API keys in `.env`:
-  - `OPENROUTER_API_KEY` for DeepSeek
-  - `GEMINI_API_KEY` for Gemini
+### Render/Cloud Deployment
+- **Start Command:**  
+  `uvicorn main:app --host 0.0.0.0 --port $PORT`
+- **Do NOT** add `PORT` to your `.env`; Render injects it automatically.
+- **Frontend:** Deploy Streamlit as a separate service or use [Streamlit Community Cloud](https://streamlit.io/cloud).
 
-</details>
+### Environment Variables
+- `OPENROUTER_API_KEY` — for DeepSeek
+- `GEMINI_API_KEY` — for Gemini
+- `BACKEND_URL` — (frontend config, use Render URL in production, `http://localhost:8000` for local)
 
 ---
 
@@ -242,7 +228,7 @@ Follow the Quickstart above, or see below for advanced configuration.
    ```
 4. **Start Backend**
    ```bash
-   uvicorn main:app --reload --port 8000
+   uvicorn main:app --host 0.0.0.0 --port 8000 --reload
    ```
 5. **Launch Frontend**
    ```bash
@@ -369,7 +355,7 @@ MIT License. See [LICENSE](LICENSE) for details.
 
 ---
 
-## 👥 Contributors
+## 👥 Credits
 
 <p align="left">
   <a href="https://github.com/Chirag-S-Kotian">

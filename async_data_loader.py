@@ -132,11 +132,12 @@ async def fetch_rss(session, source, max_entries=200):
         return []
 
 
-async def fetch_all_sources(max_docs=1200):
+# NOTE: On low-memory deployments (e.g., Render free tier), keep max_docs low (e.g., 30). Increase for production as needed.
+async def fetch_all_sources(max_docs=30):
     import logging
     async with aiohttp.ClientSession() as session:
-        # Distribute max_docs across sources (e.g., 12 sources × 100 each)
-        per_source = max(100, max_docs // max(1, len(AI_SOURCES)))
+        # Distribute max_docs across sources (e.g., 12 sources × 3 each)
+        per_source = max(3, max_docs // max(1, len(AI_SOURCES)))
         tasks = [fetch_rss(session, source, max_entries=per_source) for source in AI_SOURCES]
         all_results = await asyncio.gather(*tasks)
         # Flatten and deduplicate by URL
