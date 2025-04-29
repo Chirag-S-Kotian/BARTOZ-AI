@@ -182,7 +182,7 @@ except Exception as e:
 
 # --- RAG Retrieval Logic ---
 # This function now uses the vectorstore to find relevant context.
-def retrieve_context(query: str, vectorstore: FAISS, k: int = 6, diversify_sources: bool = True, date_from: str = None, date_to: str = None) -> str:
+def retrieve_context(query: str, vectorstore: FAISS, k: int = 3, diversify_sources: bool = True, date_from: str = None, date_to: str = None) -> str:
     """
     Advanced RAG context retrieval: deduplicate, diversify, enrich metadata, allow dynamic k.
     """
@@ -318,8 +318,7 @@ User Question: {query}
 Instructions:
 - Provide a detailed, comprehensive answer using all relevant information from the context above.
 - Cite sources (title and URL) for every fact or claim.
-- If the answer is not found in the context, reply with the following detailed message:
-  Sorry, the answer to your question could not be found in the provided research context. This means that, based on the indexed documents, there is currently no relevant or up-to-date information available to fully answer your query. The research context may include historical papers, summaries, or references to related topics, but does not contain a direct or comprehensive answer to your specific question. Please note: All indexed documents are preserved unless you manually delete the faiss_index directory. If you believe relevant research should be present, try re-indexing your sources or broadening your query. The database may contain older research (e.g., historical arXiv papers from 1995/1996) or recent papers on related but not identical topics (like LLM chatbots or general AI advances). For the most accurate results, ensure your question closely matches the topics and timeframes covered by the indexed documents. If you need the very latest research, consider updating your data sources or specifying your query more broadly.
+- If the answer is not found in the context, reply: 'No answer found in the current research context.'
 - Do NOT use prior knowledge or make up facts. Only use the supplied context.
 - Write clearly and thoroughly, not just a summary.
 Answer:
