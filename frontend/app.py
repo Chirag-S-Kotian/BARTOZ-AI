@@ -279,7 +279,16 @@ if submitted:
                             if content:
                                 st.markdown(f"<span style='color:#111;'><b>Content:</b><br><br>{content.group(1).strip()}</span>", unsafe_allow_html=True)
                 else:
-                    st.info("No supporting documents or context found in the response.")
+                    st.info("""
+No supporting documents or research context were found for your query. This means that, based on the current indexed database, there are no relevant documents or sources available to support an answer to your question.
+
+What can you do next?
+- Try rephrasing or broadening your question to cover a wider topic or timeframe.
+- Re-index or update your data sources if you believe new research should be present.
+- Remember: All previously indexed documents are preserved unless you manually delete the faiss_index directory.
+
+For the most accurate results, ensure your question matches the topics and timeframes covered by your indexed documents. If you need the latest research, consider updating your sources or specifying your query more broadly.
+""")
             except requests.exceptions.ConnectionError:
                 st.error("Error: Could not connect to the backend API. Please ensure it is running.")
             except requests.exceptions.RequestException as e:
