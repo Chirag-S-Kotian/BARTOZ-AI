@@ -5,7 +5,7 @@ from data_loader import fetch_arxiv, fetch_pubmed, fetch_ssrn, fetch_ai_companie
 from cache_loader import load_cached_documents
 import asyncio
 from async_data_loader import fetch_all_sources
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document

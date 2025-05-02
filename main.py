@@ -12,7 +12,7 @@ app = FastAPI()
 # --- Async ingestion at startup ---
 @app.on_event("startup")
 async def ingest_async_resources():
-    from langchain_community.embeddings import HuggingFaceEmbeddings
+    from langchain_huggingface import HuggingFaceEmbeddings
     from langchain_community.vectorstores import FAISS
     import os
     from async_ingest import fetch_and_ingest_async_resources
