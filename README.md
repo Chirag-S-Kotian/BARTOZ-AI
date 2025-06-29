@@ -120,6 +120,7 @@ GEMINI_API_KEY=your-gemini-key
 # 3. Ingest & Index
 $ python rag_pipeline.py
 
+
 # 4. Start Backend (Local)
 $ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
