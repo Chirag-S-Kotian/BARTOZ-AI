@@ -91,6 +91,7 @@
 - **RAG Pipeline**: Unified, scalable, and context-rich for Gemini & DeepSeek (see `rag_pipeline.py`).
 - **Modern Streamlit UI**: Responsive, theme toggle, live health, database preview (`frontend/app.py`).
 - **Extensible Sources**: Add any RSS/news/blog/research feed in `data_sources_config.py`.
+
 - **Automated Scheduler**: Schedule daily/weekly re-indexing (`scheduler.py`).
 - **FastAPI Backend**: Robust API for querying, health, preview, and source listing (`main.py`).
 - **Open Source, Modular, and Beautiful**: Add new models, sources, or UI features with ease.
