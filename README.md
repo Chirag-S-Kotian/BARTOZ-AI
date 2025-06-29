@@ -77,7 +77,6 @@
 | Open Source            |    ✅     |      ✅      |          ❌           |
 
 > 💬 <b>Why settle for less?</b> BARTOZ-AI is designed for researchers, engineers, and enthusiasts who demand transparency, extensibility, and top-tier AI knowledge.
-
 </details>
 
 ---
