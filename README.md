@@ -39,7 +39,6 @@
 </p>
 
 ---
-
 > <span style="font-size:1.1em;">BARTOZ-AI is a modern, open-source Retrieval-Augmented Generation (RAG) system focused on <b>AI, LLMs, agents, and major AI companies</b>. It combines scalable async ingestion (1000+ docs), robust deduplication, and a beautiful Streamlit UI, powered by Gemini and DeepSeek models. <b>Always up-to-date, always cited.</b></span>
 [![Open Source](https://img.shields.io/badge/Open%20Source-Yes-brightgreen)](https://github.com/Chirag-S-Kotian/BARTOZ-AI)
 [![Stars](https://img.shields.io/github/stars/Chirag-S-Kotian/BARTOZ-AI?style=social)](https://github.com/Chirag-S-Kotian/BARTOZ-AI/stargazers)
