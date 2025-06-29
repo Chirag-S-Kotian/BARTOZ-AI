@@ -6,7 +6,6 @@
   <img src="https://raw.githubusercontent.com/Chirag-S-Kotian/BARTOZ-AI/main/.github/assets/animated-neural-net.svg" alt="Animated Neural Network" width="600"/>
 </p>
 <h1 align="center">🚀 BARTOZ-AI: The Ultimate Open Source AI/LLM/Agent Research Assistant</h1>
-
 <p align="center">
   <img alt="GitHub stars" src="https://img.shields.io/github/stars/Chirag-S-Kotian/BARTOZ-AI?style=social">
   <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg">
