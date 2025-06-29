@@ -258,6 +258,7 @@ print(query_deepseek("What is the latest breakthrough by OpenAI?"))
 # or
 import asyncio
 print(asyncio.run(query_gemini("Who are the leading AI agents in 2025?")))
+
 ```
 
 ---
