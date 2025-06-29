@@ -5,7 +5,6 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/Chirag-S-Kotian/BARTOZ-AI/main/.github/assets/animated-neural-net.svg" alt="Animated Neural Network" width="600"/>
 </p>
-
 <h1 align="center">🚀 BARTOZ-AI: The Ultimate Open Source AI/LLM/Agent Research Assistant</h1>
 
 <p align="center">
