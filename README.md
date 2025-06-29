@@ -36,6 +36,7 @@
   <img alt="Gemini" src="https://img.shields.io/badge/LLM-Gemini-4285F4?logo=google">
   <img alt="DeepSeek" src="https://img.shields.io/badge/LLM-DeepSeek-00897B">
   <img alt="Async" src="https://img.shields.io/badge/Async-Enabled-8BC34A">
+
 </p>
 
 ---
