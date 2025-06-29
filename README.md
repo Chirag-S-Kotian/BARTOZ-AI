@@ -23,7 +23,6 @@
 > **BARTOZ-AI** is not just another chatbot. It's a next-generation, open-source RAG (Retrieval-Augmented Generation) platform built for AI/ML/LLM/Agent research at scale. Designed for engineers, researchers, and innovators who demand transparency, extensibility, and state-of-the-art answers with sources. 
 
 ---
-
 <p align="center">
   <a href="https://github.com/Chirag-S-Kotian/BARTOZ-AI">
     <img alt="GitHub stars" src="https://img.shields.io/github/stars/Chirag-S-Kotian/BARTOZ-AI?style=social">
