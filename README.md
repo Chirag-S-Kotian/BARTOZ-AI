@@ -8,7 +8,6 @@
 <h1 align="center">🚀 BARTOZ-AI: The Ultimate Open Source AI/LLM/Agent Research Assistant</h1>
 
 <p align="center">
-
   <img alt="GitHub stars" src="https://img.shields.io/github/stars/Chirag-S-Kotian/BARTOZ-AI?style=social">
   <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg">
   <img alt="Python Version" src="https://img.shields.io/badge/python-3.9%2B-blue">
