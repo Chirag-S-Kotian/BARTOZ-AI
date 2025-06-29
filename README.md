@@ -103,6 +103,7 @@
 <details>
 <summary>⚡ <strong>Quickstart</strong></summary>
 
+
 ```sh
 # 1. Clone & Install
 $ git clone https://github.com/Chirag-S-Kotian/BARTOZ-AI.git
