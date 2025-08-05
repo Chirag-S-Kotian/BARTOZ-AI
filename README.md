@@ -11,6 +11,7 @@
 
 
 
+
 <p align="center">
   <img src="https://raw.githubusercontent.com/Chirag-S-Kotian/BARTOZ-AI/main/.github/assets/animated-neural-net.svg" alt="Animated Neural Network" width="600"/>
 </p>
